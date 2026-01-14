@@ -1,0 +1,88 @@
+---
+title: "Hands-on Exercise 1"
+author: "Ng Meng Ye"
+---
+
+# Getting Started
+
+## Install and launching R packages
+
+The code chunk below uses p_load() of pacman package to check if tidyverse packages have been installed in the computer. If they are, then they will be launched into R.
+
+```{r}
+pacman::p_load(tidyverse)
+```
+
+## Importing the data
+
+```{r}
+exam_data <- read_csv("data/Exam_data.csv")
+```
+
+## R Graphics VS ggplot
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+hist(exam_data$MATHS)
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+ggplot(data=exam_data,
+       aes(x = MATHS)) + 
+  geom_histogram(bins=10,
+                 boundary = 100,
+                 color = "black",
+                 fill="grey")+
+  ggtitle("Distribution of Maths scores")
+```
+
+::: callout-note
+Why ggplot2 is recommended? ggplot2 looks better
+:::
+
+# Essential Grammatical Elements in ggplot2:data
+
+```{r}
+ggplot(data=exam_data)
+```
+
+::: callout-note
+-   A blank canvas appears.
+-   ggplot() initializes a ggplot object.
+-   The data argument defines the dataset to be used for plotting.
+-   If the dataset is not already a data.frame, it will be converted to one by fortify().
+:::
+
+```{r}
+ggplot(data=exam_data,
+       aes(x=MATHS))
+```
+#Essential Grammatical Elements in ggplot2: geom
+
+## geom_bar
+
+```{r}
+ggplot(data=exam_data, 
+       aes(x=RACE)) +
+  geom_bar()
+```
+```{r}
+ggplot(data=exam_data, 
+       aes(x=MATHS)) +
+  geom_boxplot()
+```
+## geom_dotplot
+
+```{r}
+ggplot(data=exam_data, 
+       aes(x = MATHS)) +
+  geom_dotplot(binwidth=2.5,         
+               dotsize = 0.5) +      
+  scale_y_continuous(NULL,           
+                     breaks = NULL)  
+```
+## geom_histogram()
+
