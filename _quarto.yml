@@ -4,6 +4,7 @@ project:
 website:
   title: "ISSS608-VAA"
   navbar:
+    background: dark
     left:
       - text: "Hands-on Exercise"
         menu:
@@ -12,12 +13,17 @@ website:
     right:
       - href: index.qmd
         text: Home
-      - about.qmd
+      - href: https://piazza.com/class/mjzqgqrgnu31y3
+        text: Piazza  
+      - icon: github
+        href: https://github.com/ngmengye/ISSS608-VAA
+      
 
 format:
   html:
-    theme: cosmo
+    theme: journal
     css: styles.css
     toc: true
     
 editor: visual
+
