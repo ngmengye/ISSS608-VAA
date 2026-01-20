@@ -1,0 +1,500 @@
+---
+title: "Hands-on Exercise 2"
+author: "Ng Meng Ye"
+---
+
+# Getting Started
+
+## Install and launching the required libraries
+
+### Local Package Check
+
+```{r}
+#| echo: false
+#| code-fold: true
+#| code-summary: "Show the code"
+pkg_list <- data.frame(
+  Package = c("tidyverse", "ggrepel", "patchwork", "ggthemes", "hrbrthemes"),
+  Status = c("Data manipulation and core visualization", "Prevents text labels from overlapping on plots", "Combines multiple plots into one layout", "Premade themes", "igh-quality, typography-centric themes")
+)
+
+knitr::kable(pkg_list, caption = "Packages for this Project")
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+pacman::p_load(ggrepel, patchwork, 
+               ggthemes, hrbrthemes,
+               tidyverse) 
+```
+
+## Importing Data
+
+```{r}
+exam_data <- read_csv("data/Exam_data.csv")
+```
+
+```{r}
+glimpse(exam_data)
+```
+
+```{r}
+summary(exam_data)
+```
+
+## Beyond ggplot2 Annotation: ggrepel
+
+### Without ggrepel
+
+::: panel-tabset
+### The plot
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+ggplot(data=exam_data, 
+       aes(x= MATHS, 
+           y=ENGLISH)) +
+  geom_point() +
+  geom_smooth(method=lm, 
+              linewidth=0.5) +  
+  geom_label(aes(label = ID), 
+             hjust = .5, 
+             vjust = -.5) +
+  coord_cartesian(xlim=c(0,100),
+                  ylim=c(0,100)) +
+  ggtitle("English scores versus Maths scores for Primary 3")
+```
+
+### The code
+
+``` r
+ggplot(data=exam_data, 
+       aes(x= MATHS, 
+           y=ENGLISH)) +
+  geom_point() +
+  geom_smooth(method=lm, 
+              size=0.5) +  
+  geom_label(aes(label = ID), 
+             hjust = .5, 
+             vjust = -.5) +
+  coord_cartesian(xlim=c(0,100),
+                  ylim=c(0,100)) +
+  ggtitle("English scores versus Maths scores for Primary 3")
+```
+:::
+
+### Working with ggrepel
+
+::: panel-tabset
+### The plot
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+ggplot(data=exam_data, 
+       aes(x= MATHS, 
+           y=ENGLISH)) +
+  geom_point() +
+  geom_smooth(method=lm, 
+              size=0.5) +  
+  geom_label_repel(aes(label = ID), 
+                   fontface = "bold") +
+  coord_cartesian(xlim=c(0,100),
+                  ylim=c(0,100)) +
+  ggtitle("English scores versus Maths scores for Primary 3")
+```
+
+### The code
+
+``` r
+ggplot(data=exam_data, 
+       aes(x= MATHS, 
+           y=ENGLISH)) +
+  geom_point() +
+  geom_smooth(method=lm, 
+              size=0.5) +  
+  geom_label_repel(aes(label = ID), 
+                   fontface = "bold") +
+  coord_cartesian(xlim=c(0,100),
+                  ylim=c(0,100)) +
+  ggtitle("English scores versus Maths scores for Primary 3")
+```
+:::
+
+## Beyond ggplot2 Themes
+
+::: panel-tabset
+### The plot
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+ggplot(data=exam_data, 
+             aes(x = MATHS)) +
+  geom_histogram(bins=20, 
+                 boundary = 100,
+                 color="grey25", 
+                 fill="grey90") +
+  theme_light() +
+  ggtitle("Distribution of Maths scores") 
+
+```
+
+### The code
+
+``` r
+ggplot(data=exam_data, 
+             aes(x = MATHS)) +
+  geom_histogram(bins=20, 
+                 boundary = 100,
+                 color="grey25", 
+                 fill="grey90") +
+  theme_gray() +
+  ggtitle("Distribution of Maths scores") 
+```
+:::
+
+### Working with ggtheme package
+
+::: panel-tabset
+### The plot
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+ggplot(data=exam_data, 
+       aes(x = MATHS)) +
+  geom_histogram(bins=20, 
+                 boundary = 100,
+                 color="grey25", 
+                 fill="grey90") +
+  theme_economist() + 
+  theme(
+    # Sets the background to the "Economist" cream color
+    panel.background = element_rect(fill = "#E9E4E0", color = NA),
+    plot.background = element_rect(fill = "#E9E4E0", color = NA),
+    
+    # Changes the horizontal grid lines from white to light grey
+    panel.grid.major.y = element_line(color = "grey80"), 
+    
+    # Ensures vertical grid lines are removed (typical for this style)
+    panel.grid.major.x = element_blank()
+  ) +
+  ggtitle("Distribution of Maths scores")
+
+```
+
+### The code
+
+``` r
+ggplot(data=exam_data, 
+             aes(x = MATHS)) +
+  geom_histogram(bins=20, 
+                 boundary = 100,
+                 color="grey25", 
+                 fill="grey90") +
+  theme_economist() +
+  ggtitle("Distribution of Maths scores") 
+```
+:::
+
+### Working with hrbthemes package
+
+::: panel-tabset
+### The plot
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+ggplot(data=exam_data, 
+             aes(x = MATHS)) +
+  geom_histogram(bins=20, 
+                 boundary = 100,
+                 color="grey25", 
+                 fill="grey90") +
+  ggtitle("Distribution of Maths scores") +
+  theme_ipsum()
+```
+
+### The code
+``` r
+ggplot(data=exam_data, 
+             aes(x = MATHS)) +
+  geom_histogram(bins=20, 
+                 boundary = 100,
+                 color="grey25", 
+                 fill="grey90") +
+  ggtitle("Distribution of Maths scores") +
+  theme_ipsum()
+### The code
+```
+:::
+
+::: panel-tabset
+### The plot
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+ggplot(data=exam_data, 
+             aes(x = MATHS)) +
+  geom_histogram(bins=20, 
+                 boundary = 100,
+                 color="grey25", 
+                 fill="grey90") +
+  ggtitle("Distribution of Maths scores") +
+  theme_ipsum(axis_title_size = 18,
+              base_size = 15,
+              grid = "Y")
+```
+
+### The code
+
+``` r
+ggplot(data=exam_data, 
+             aes(x = MATHS)) +
+  geom_histogram(bins=20, 
+                 boundary = 100,
+                 color="grey25", 
+                 fill="grey90") +
+  ggtitle("Distribution of Maths scores") +
+  theme_ipsum(axis_title_size = 18,
+              base_size = 15,
+              grid = "Y")
+```
+:::
+
+::: callout-note
+-   `axis_title_size` argument is used to increase the font size of the axis title to 18
+
+-   `base_size` argument is used to increase the default axis label to 15
+
+-   `grid` argument is used to remove the x-axis grid lines
+:::
+
+## Beyond Single Graph
+
+::: panel-tabset
+### The plot
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+p1 <- ggplot(data=exam_data, 
+             aes(x = MATHS)) +
+  geom_histogram(bins=20, 
+                 boundary = 100,
+                 color="grey25", 
+                 fill="grey90") + 
+  coord_cartesian(xlim=c(0,100)) +
+  ggtitle("Distribution of Maths scores")
+
+p1
+```
+
+### The code
+
+``` r
+p1 <- ggplot(data=exam_data, 
+             aes(x = MATHS)) +
+  geom_histogram(bins=20, 
+                 boundary = 100,
+                 color="grey25", 
+                 fill="grey90") + 
+  coord_cartesian(xlim=c(0,100)) +
+  ggtitle("Distribution of Maths scores")
+```
+:::
+
+
+::: panel-tabset
+### The plot
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+p2 <- ggplot(data=exam_data, 
+             aes(x = ENGLISH)) +
+  geom_histogram(bins=20, 
+                 boundary = 100,
+                 color="grey25", 
+                 fill="grey90") +
+  coord_cartesian(xlim=c(0,100)) +
+  ggtitle("Distribution of English scores")
+
+p2
+```
+
+### The code
+
+``` r
+p2 <- ggplot(data=exam_data, 
+             aes(x = ENGLISH)) +
+  geom_histogram(bins=20, 
+                 boundary = 100,
+                 color="grey25", 
+                 fill="grey90") +
+  coord_cartesian(xlim=c(0,100)) +
+  ggtitle("Distribution of English scores")
+```
+:::
+
+
+
+::: panel-tabset
+### The plot
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+p3 <- ggplot(data=exam_data, 
+             aes(x= MATHS, 
+                 y=ENGLISH)) +
+  geom_point() +
+  geom_smooth(method=lm, 
+              size=0.5) +  
+  coord_cartesian(xlim=c(0,100),
+                  ylim=c(0,100)) +
+  ggtitle("English scores versus Maths scores for Primary 3")
+
+p3
+```
+
+### The code
+
+``` r
+p3 <- ggplot(data=exam_data, 
+             aes(x= MATHS, 
+                 y=ENGLISH)) +
+  geom_point() +
+  geom_smooth(method=lm, 
+              size=0.5) +  
+  coord_cartesian(xlim=c(0,100),
+                  ylim=c(0,100)) +
+  ggtitle("English scores versus Maths scores for Primary 3")
+```
+:::
+
+### Creating Composite Graphics
+
+
+### Combining 2 ggplot2 graphs
+::: panel-tabset
+### The plot
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+p1 + p2
+```
+
+### The code
+
+``` r
+p1 + p2
+```
+:::
+
+### Combining 3 ggplot2 graphs
+::: panel-tabset
+### The plot
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+(p1 / p2) | p3
+```
+
+### The code
+
+``` r
+(p1 / p2) | p3
+```
+:::
+
+
+### Creating a composite figure with tag
+
+::: panel-tabset
+### The plot
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+((p1 / p2) | p3)+ 
+  plot_annotation(tag_levels = 'I')
+```
+
+### The code
+
+``` r
+((p1 / p2) | p3)+ 
+  plot_annotation(tag_levels = 'I')
+```
+:::
+
+
+### Creating figure with insert
+
+
+::: panel-tabset
+### The plot
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+p3 + inset_element(p2, 
+                   left = 0.02, 
+                   bottom = 0.7, 
+                   right = 0.5, 
+                   top = 1)
+```
+
+### The code
+
+``` r
+p3 + inset_element(p2, 
+                   left = 0.02, 
+                   bottom = 0.7, 
+                   right = 0.5, 
+                   top = 1)
+```
+:::
+
+### Creating a composite figure by using patchwork and ggtheme
+
+
+::: panel-tabset
+### The plot
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+patchwork <- (p1 / p2) | p3
+patchwork & theme_economist()
+```
+
+### The code
+
+``` r
+patchwork <- (p1 / p2) | p3
+patchwork & theme_economist()
+```
+:::
+

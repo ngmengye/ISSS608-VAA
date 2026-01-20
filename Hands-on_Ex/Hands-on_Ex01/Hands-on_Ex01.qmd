@@ -60,6 +60,7 @@ ggplot(data=exam_data)
 ggplot(data=exam_data,
        aes(x=MATHS))
 ```
+
 # Essential Grammatical Elements in ggplot2: geom
 
 ## geom_bar
@@ -69,11 +70,13 @@ ggplot(data=exam_data,
        aes(x=RACE)) +
   geom_bar()
 ```
+
 ```{r}
 ggplot(data=exam_data, 
        aes(x=MATHS)) +
   geom_boxplot()
 ```
+
 ## geom_dotplot
 
 ```{r}
@@ -84,8 +87,8 @@ ggplot(data=exam_data,
   scale_y_continuous(NULL,           
                      breaks = NULL)  
 ```
-## geom_histogram
 
+## geom_histogram
 
 ```{r}
 ggplot(data=exam_data, 
@@ -93,7 +96,6 @@ ggplot(data=exam_data,
   geom_histogram()       
 
 ```
-
 
 ## Modify geom()
 
@@ -107,7 +109,6 @@ ggplot(data=exam_data,
 ```
 
 ## Modify aes()
-
 
 ```{r}
 ggplot(data=exam_data, 
@@ -150,8 +151,8 @@ ggplot(data=exam_data,
            x= GENDER)) +
   geom_boxplot(notch=TRUE)
 ```
-## geom_violin
 
+## geom_violin
 
 ```{r}
 ggplot(data=exam_data, 
@@ -179,6 +180,7 @@ ggplot(data=exam_data,
   geom_point(position="jitter", 
              size = 0.5)        
 ```
+
 # Essential Grammatical Elements in ggplot2: stat
 
 ## stat
@@ -209,6 +211,7 @@ ggplot(data=exam_data,
   geom_point() +
   geom_smooth(size=0.5)
 ```
+
 ```{r}
 ggplot(data=exam_data, 
        aes(x= MATHS, 
@@ -217,11 +220,10 @@ ggplot(data=exam_data,
   geom_smooth(method=lm, 
               linewidth=0.5)
 ```
+
 # Essential Grammatical Elements in ggplot2: Facets
 
-
 ## facet_wrap
-
 
 ```{r}
 ggplot(data=exam_data, 
@@ -247,12 +249,14 @@ ggplot(data=exam_data,
        aes(x=RACE)) +
   geom_bar()
 ```
+
 ```{r}
 ggplot(data=exam_data, 
        aes(x=RACE)) +
   geom_bar() +
   coord_flip()
 ```
+
 ## Change y and x axis range
 
 ```{r}
@@ -261,6 +265,7 @@ ggplot(data=exam_data,
   geom_point() +
   geom_smooth(method=lm, size=0.5)
 ```
+
 ```{r}
 ggplot(data=exam_data, 
        aes(x= MATHS, y=ENGLISH)) +
@@ -270,6 +275,7 @@ ggplot(data=exam_data,
   coord_cartesian(xlim=c(0,100),
                   ylim=c(0,100))
 ```
+
 # Essential Grammatical Elements in ggplot2: themes
 
 ## theme
@@ -281,6 +287,7 @@ ggplot(data=exam_data,
   coord_flip() +
   theme_gray()
 ```
+
 ```{r}
 ggplot(data=exam_data, 
        aes(x=RACE)) +
@@ -288,6 +295,7 @@ ggplot(data=exam_data,
   coord_flip() +
   theme_classic()
 ```
+
 ```{r}
 ggplot(data=exam_data, 
        aes(x=RACE)) +
@@ -295,5 +303,3 @@ ggplot(data=exam_data,
   coord_flip() +
   theme_minimal()
 ```
-
-
