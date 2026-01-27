@@ -141,6 +141,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html">
  <span class="dropdown-text">Hands-on Exercise 2</span></a>
   </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03.html">
+ <span class="dropdown-text">Hands-on Exercise 3</span></a>
+  </li>  
     </ul>
   </li>
 </ul>
@@ -712,11 +716,8 @@ Note
 </section>
 <section id="creating-a-composite-figure-by-using-patchwork-and-ggtheme" class="level3">
 <h3 class="anchored" data-anchor-id="creating-a-composite-figure-by-using-patchwork-and-ggtheme">Creating a composite figure by using patchwork and ggtheme</h3>
-<div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-14-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-14-1" role="tab" aria-controls="tabset-14-1" aria-selected="true" href="">The plot</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-14-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-14-2" role="tab" aria-controls="tabset-14-2" aria-selected="false" href="">The code</a></li></ul>
-<div class="tab-content">
-<div id="tabset-14-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-14-1-tab">
 <div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>p1 <span class="sc">+</span> p2</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -725,10 +726,28 @@ Note
 </div>
 </div>
 </div>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-14-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-14-1" role="tab" aria-controls="tabset-14-1" aria-selected="true" href="">The plot</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-14-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-14-2" role="tab" aria-controls="tabset-14-2" aria-selected="false" href="">The code</a></li></ul>
+<div class="tab-content">
+<div id="tabset-14-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-14-1-tab">
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>patchwork <span class="ot">&lt;-</span> (p1 <span class="sc">/</span> p2) <span class="sc">|</span> p3</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>patchwork</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`geom_smooth()` using formula = 'y ~ x'</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Hands-on_Ex02_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
 </div>
 <div id="tabset-14-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-14-2-tab">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>patchwork <span class="ot">&lt;-</span> (p1 <span class="sc">/</span> p2) <span class="sc">|</span> p3</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>patchwork <span class="sc">&amp;</span> <span class="fu">theme_economist</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>patchwork <span class="ot">&lt;-</span> (p1 <span class="sc">/</span> p2) <span class="sc">|</span> p3</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>patchwork <span class="sc">&amp;</span> <span class="fu">theme_economist</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </div>
 </div>

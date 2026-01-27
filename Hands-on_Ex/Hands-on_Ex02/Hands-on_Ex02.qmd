@@ -224,6 +224,7 @@ ggplot(data=exam_data,
 ```
 
 ### The code
+
 ``` r
 ggplot(data=exam_data, 
              aes(x = MATHS)) +
@@ -315,7 +316,6 @@ p1 <- ggplot(data=exam_data,
 ```
 :::
 
-
 ::: panel-tabset
 ### The plot
 
@@ -348,8 +348,6 @@ p2 <- ggplot(data=exam_data,
   ggtitle("Distribution of English scores")
 ```
 :::
-
-
 
 ::: panel-tabset
 ### The plot
@@ -388,8 +386,8 @@ p3 <- ggplot(data=exam_data,
 
 ### Creating Composite Graphics
 
-
 ### Combining 2 ggplot2 graphs
+
 ::: panel-tabset
 ### The plot
 
@@ -408,6 +406,7 @@ p1 + p2
 :::
 
 ### Combining 3 ggplot2 graphs
+
 ::: panel-tabset
 ### The plot
 
@@ -424,7 +423,6 @@ p1 + p2
 (p1 / p2) | p3
 ```
 :::
-
 
 ### Creating a composite figure with tag
 
@@ -447,9 +445,7 @@ p1 + p2
 ```
 :::
 
-
 ### Creating figure with insert
-
 
 ::: panel-tabset
 ### The plot
@@ -479,15 +475,17 @@ p3 + inset_element(p2,
 ### Creating a composite figure by using patchwork and ggtheme
 
 
+```{r}
+p1 + p2
+```
+
+
 ::: panel-tabset
 ### The plot
 
 ```{r}
-#| echo: false
-#| message: false
-#| warning: false
 patchwork <- (p1 / p2) | p3
-patchwork & theme_economist()
+patchwork
 ```
 
 ### The code
@@ -497,4 +495,6 @@ patchwork <- (p1 / p2) | p3
 patchwork & theme_economist()
 ```
 :::
+
+
 
