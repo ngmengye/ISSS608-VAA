@@ -94,13 +94,11 @@ summary(students_clean$GPA)
 
 # Likert Diverging Bar Chart
 
-We will use the ggstats package (function gglikert) because it works directly with your tidy data frame and is highly customizable.
+We will use the ggstats package (function gglikert).
 
-Prepare the Data Summary
-
+## Prepare the Data Summary
+We keep counts here so HH can calculate the totals. Rename for cleaner chart labels.
 ```{r}
-# 1. Prepare the Data (Counts)
-# We keep counts here so HH can calculate the totals for us
 likert_summary <- students_likert %>%
   dplyr::select(Adapt_Learning_Uni, Study_Methods, SupportOf_Uni, 
          SupportOf_Lec, Facilitie_Uni, Quality_Lecturer, 
@@ -109,7 +107,6 @@ likert_summary <- students_likert %>%
   group_by(Question, Response) %>%
   summarise(count = n(), .groups = 'drop') %>%
   pivot_wider(names_from = Response, values_from = count, values_fill = 0) %>%
-  # Rename for cleaner chart labels
   mutate(Question = recode(Question,
     "Adapt_Learning_Uni" = "Adaptation",
     "Study_Methods" = "Methods",
@@ -123,11 +120,9 @@ likert_summary <- students_likert %>%
   )) %>%
   as.data.frame()
 
-# 2. Formatting for HH (Assign Row Names)
 row.names(likert_summary) <- likert_summary$Question
 likert_summary_matrix <- likert_summary[, -1] # Remove the 'Question' column
 
-# 3. Generate the Likert Chart in Percentages
 likert(likert_summary_matrix, 
        main = "Factors Affecting Learning Outcomes",
        as.percent = TRUE,             
@@ -148,11 +143,10 @@ Students perceive Lecturer Quality and Lecturer Support as the university's prim
 
 # Gender vs. Academic Performance (GPA)
 
-Create a *Faceted Proportional Bar Chart (100% Stacked Bar)* to see if Gender correlates with higher GPAs.
+## Create a *Faceted Proportional Bar Chart (100% Stacked Bar)* to see if Gender correlates with higher GPAs.
+Summarize Data for Labels. We calculate percentages first so we can add text labels to the bars
 
 ```{r}
-# 1. Summarize Data for Labels
-# We calculate percentages first so we can add text labels to the bars
 gpa_gender_summary <- students_clean %>%
   group_by(Gender, GPA) %>%
   summarise(count = n(), .groups = 'drop') %>%
@@ -196,19 +190,17 @@ ggplot(gpa_gender_summary,
 Female students show a stronger tendency toward academic excellence.
 :::
 
-# Statistical Confirmation
+# Statistical Confirmation for Gender vs. Academic Performance (GPA)
 
-Perform a Chi-Square Test of Independence. This will tell us if the relationship between Gender and GPA is statistically significant ($p < 0.05$).
+Perform a Chi-Square Test of Independence. This will tell if the relationship between Gender and GPA is statistically significant ($p < 0.05$).
 
+We use ggbarstats to test the association between Gender and GPA
 
 ```{r}
-# --- Observation 3: Statistical Confirmation of Gender Performance ---
-
-# We use ggbarstats to test the association between Gender and GPA
 ggbarstats(
   data = students_clean,
-  x = GPA,           # The Dependent Variable (Grades)
-  y = Gender,        # The Independent Variable (Group)
+  x = GPA,           
+  y = Gender,        
   title = "Is the Gender Gap Statistically Significant?",
   xlab = "GPA Category",
   legend.title = "Gender",
@@ -226,18 +218,15 @@ Cramer's V = 0.06, the difference is strong.
 
 # The Study-Life Balance (Time Studying vs Social Media)
 
-Use a *faceted ridge plot* is excellent for showing how "Time Studying" and "Time on Social Media" are distributed across GPA bands.
-
+## Use a *faceted ridge plot* is excellent for showing how "Time Studying" and "Time on Social Media" are distributed across GPA bands.
 
 ```{r}
-# --- Observation 4: Study Intensity across GPA Levels ---
 
 students_clean %>%
-  # Ensure Time_Studying is numeric for the density plot calculation
+  # 
   mutate(Time_Studying_Num = as.numeric(Time_Studying)) %>%
   ggplot(aes(x = Time_Studying_Num, y = GPA, fill = stat(x))) +
   geom_density_ridges_gradient(scale = 2.5, rel_min_height = 0.01, gradient_lwd = 1) +
-  # Map numeric breaks to the actual hour strings from your Codebook
   scale_x_continuous(
     breaks = 1:5,
     labels = c("<2h", "2-4h", "4-6h", "6-8h", ">8h")
@@ -262,7 +251,6 @@ The data suggests that attaining an 'Excellent' GPA (>3.6) is highly correlated 
 We will use a 100% Stacked Bar but add a High-Contrast highlight for the "Excellent" category.
 
 ```{r}
-# 1. Prepare the data
 threshold_data <- students_clean %>%
   group_by(Time_Studying, GPA) %>%
   summarise(count = n(), .groups = 'drop') %>%
@@ -295,7 +283,9 @@ ggplot(threshold_data, aes(x = as.factor(Time_Studying), y = percentage, fill = 
   theme_minimal()
 ```
 
-
+::: callout-note
+The data suggests that attaining an 'Excellent' GPA (>3.6) is highly correlated with a daily study commitment of at least 4 hours
+:::
 
 
 
