@@ -1,5 +1,5 @@
 ---
-title: "Hands-on Exercise 06"
+title: "Hands-on Exercise 07"
 author: "Ng Meng Ye"
 ---
 
@@ -77,9 +77,8 @@ Step 1: Deriving weekday and hour of day fields
 
 Before we can plot the calender heatmap, two new fields namely wkday and hour need to be derived. In this step, we will write a function to perform the task.
 
+
 ```{r}
-#| echo: false
-#| message: false
 #| warning: false
 make_hr_wkday <- function(ts, sc, tz) {
   real_times <- ymd_hms(ts, 
@@ -90,7 +89,6 @@ make_hr_wkday <- function(ts, sc, tz) {
                    hour = hour(real_times))
   return(dt)
   }
-
 ```
 
 ::: callout-note
@@ -100,8 +98,8 @@ make_hr_wkday <- function(ts, sc, tz) {
 
 Step 2: Deriving the attacks tibble data frame
 
+
 ```{r}
-#| echo: false
 #| message: false
 #| warning: false
 wkday_levels <- c('Saturday', 'Friday', 
@@ -119,8 +117,9 @@ attacks <- attacks %>%
     wkday, levels = wkday_levels),
     hour  = factor(
       hour, levels = 0:23))
-
 ```
+
+
 
 ::: callout-note
 Beside extracting the necessary data into attacks data frame, mutate() of dplyr package is used to convert wkday and hour fields into factor so they’ll be ordered when plotting
@@ -134,6 +133,8 @@ kable(head(attacks))
 
 ### Building the Calendar Heatmaps
 
+::: panel-tabset
+### The plot
 ```{r}
 #| echo: false
 #| message: false
@@ -162,6 +163,37 @@ theme(axis.ticks = element_blank(),
       legend.title = element_text(size = 8),
       legend.text = element_text(size = 6) )
 ```
+
+### The code
+```r
+grouped <- attacks %>% 
+  count(wkday, hour) %>% 
+  ungroup() %>%
+  na.omit()
+
+ggplot(grouped, 
+       aes(hour, 
+           wkday, 
+           fill = n)) + 
+geom_tile(color = "white", 
+          size = 0.1) + 
+theme_tufte(base_family = "Helvetica") + 
+coord_equal() +
+scale_fill_gradient(name = "# of attacks",
+                    low = "sky blue", 
+                    high = "dark blue") +
+labs(x = NULL, 
+     y = NULL, 
+     title = "Attacks by weekday and time of day") +
+theme(axis.ticks = element_blank(),
+      plot.title = element_text(hjust = 0.5),
+      legend.title = element_text(size = 8),
+      legend.text = element_text(size = 6) )
+```
+
+:::
+
+
 
 ::: callout-note
 -   a tibble data table called grouped is derived by aggregating the attack by wkday and hour fields.
@@ -207,6 +239,8 @@ top4_attacks <- attacks %>%
 
 Build the Multiple Heatmaps
 
+::: panel-tabset
+### The plot
 ```{r}
 #| echo: false
 #| message: false
@@ -231,6 +265,32 @@ ggplot(top4_attacks,
         legend.title = element_text(size = 8),
         legend.text = element_text(size = 6))
 ```
+
+### The code
+```r
+# Plot the heatmaps
+ggplot(top4_attacks, 
+       aes(x = hour, 
+           y = wkday, 
+           fill = n)) + 
+  geom_tile(color = "white", size = 0.1) + 
+  theme_tufte(base_family = "Helvetica") + 
+  coord_equal() +
+  scale_fill_gradient(name = "# of attacks",
+                      low = "sky blue", 
+                      high = "dark blue") +
+  facet_wrap(~source_country, ncol = 2) +
+  labs(x = NULL, y = NULL, 
+       title = "Attacks weekday and time of day") +
+  theme(axis.ticks = element_blank(),
+        axis.text.x = element_text(size = 7),
+        plot.title = element_text(hjust = 0.5),
+        legend.title = element_text(size = 8),
+        legend.text = element_text(size = 6))
+```
+
+:::
+
 
 ### Plotting Multiple Calendar Heatmaps
 
@@ -258,6 +318,9 @@ top4_attacks <- attacks %>%
 
 Step 3: Plotting the Multiple Calender Heatmap by using ggplot2 package.
 
+
+::: panel-tabset
+### The plot
 ```{r}
 #| echo: false
 #| message: false
@@ -282,6 +345,32 @@ ggplot(top4_attacks,
         legend.title = element_text(size = 8),
         legend.text = element_text(size = 6) )
 ```
+
+### The code
+```r
+ggplot(top4_attacks, 
+       aes(hour, 
+           wkday, 
+           fill = n)) + 
+  geom_tile(color = "white", 
+          size = 0.1) + 
+  theme_tufte(base_family = "Helvetica") + 
+  coord_equal() +
+  scale_fill_gradient(name = "# of attacks",
+                    low = "sky blue", 
+                    high = "dark blue") +
+  facet_wrap(~source_country, ncol = 2) +
+  labs(x = NULL, y = NULL, 
+     title = "Attacks on top 4 countries by weekday and time of day") +
+  theme(axis.ticks = element_blank(),
+        axis.text.x = element_text(size = 7),
+        plot.title = element_text(hjust = 0.5),
+        legend.title = element_text(size = 8),
+        legend.text = element_text(size = 6) )
+```
+
+:::
+
 
 ## Plotting Cycle Plot
 
@@ -323,6 +412,9 @@ hline.data <- USA %>%
 
 Step 5: Plotting the cycle plot
 
+
+::: panel-tabset
+### The plot
 ```{r}
 #| echo: false
 #| message: false
@@ -346,6 +438,31 @@ ggplot() +
   theme_tufte(base_family = "Helvetica")
 ```
 
+### The code
+```r
+ggplot() + 
+  geom_line(data=USA,
+            aes(x=year, 
+                y=`USA`, 
+                group=month), 
+            colour="black") +
+  geom_hline(aes(yintercept=avgvalue), 
+             data=hline.data, 
+             linetype=6, 
+             colour="red", 
+             size=0.5) + 
+  facet_grid(~month) +
+  labs(axis.text.x = element_blank(),
+       title = "Visitor arrivals from USA by air, Jan 2010-Dec 2019") +
+  xlab("") +
+  ylab("No. of Visitors") +
+  theme_tufte(base_family = "Helvetica")
+```
+
+:::
+
+
+
 ## Plotting Slopegraph
 
 Step 1: Import data
@@ -356,41 +473,37 @@ rice <- read_csv("Data/rice.csv")
 
 Step 2: Plotting the slopegraph
 
+Next, code chunk below will be used to plot a basic slopegraph as shown below.
 
+
+::: panel-tabset
+### The plot
 ```{r}
-library(tidyverse)
-
-# Filter for the years used in the SMU exercise
-rice_filtered <- rice %>%
+#| echo: false
+#| message: false
+#| warning: false
+rice %>% 
   mutate(Year = factor(Year)) %>%
-  filter(Year %in% c(1961, 1980))
+  filter(Year %in% c(1961, 1980)) %>%
+  newggslopegraph(Year, Yield, Country,
+                Title = "Rice Yield of Top 11 Asian Counties",
+                SubTitle = "1961-1980",
+                Caption = "Prepared by: Ng Meng Ye")
 ```
 
-```{r}
-ggplot(data = rice_filtered, 
-       aes(x = Year, y = Yield, group = Country)) +
-  # Draw the slopes
-  geom_line(aes(color = Country), size = 1, show.legend = FALSE) +
-  # Add points at the ends
-  geom_point(aes(color = Country), size = 3, show.legend = FALSE) +
-  # Add text labels on the left (1961)
-  geom_text(data = rice_filtered %>% filter(Year == 1961),
-            aes(label = paste0(Country, " (", round(Yield, 1), ")")),
-            hjust = 1.2, size = 3) +
-  # Add text labels on the right (1980)
-  geom_text(data = rice_filtered %>% filter(Year == 1980),
-            aes(label = paste0(Country, " (", round(Yield, 1), ")")),
-            hjust = -0.2, size = 3) +
-  # Cleanup the theme to match Tufte's style
-  theme_minimal() +
-  theme(panel.grid = element_blank(),
-        axis.ticks = element_blank(),
-        axis.text.y = element_blank(),
-        axis.title = element_blank()) +
-  # Expand limits to make room for labels
-  scale_x_discrete(expand = expansion(mult = c(0.5, 0.5))) +
-  labs(title = "Rice Yield Comparison", subtitle = "1961 vs 1980")
+### The code
+```r
+rice %>% 
+  mutate(Year = factor(Year)) %>%
+  filter(Year %in% c(1961, 1980)) %>%
+  newggslopegraph(Year, Yield, Country,
+                Title = "Rice Yield of Top 11 Asian Counties",
+                SubTitle = "1961-1980",
+                Caption = "Prepared by: Dr. Kam Tin Seong")
 ```
+
+:::
+
 ::: callout-note
 For effective data visualisation design, `factor()` is used convert the value type of Year field from numeric to factor.
 :::
