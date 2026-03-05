@@ -1,0 +1,196 @@
+---
+title: "COFINFAD: Colombian Fintech Financial Analysis"
+author: "Ng Meng Ye"
+---
+
+# Project Overview & Background
+
+This project examines the **digital service adoption patterns** of 48,723 customers within a Colombian fintech ecosystem, analyzing **3,159,157 transactions** from January to December 2023.
+
+## Regional Context: Colombia's Digital Pivot
+
+Colombia serves as a "global testing ground" for financial innovation due to its unique socioeconomic landscape:
+
+-   **Demographics**: With a population of approximately **54 million** (2026 est.), Colombia has a relatively young and urbanized demographic. The median age is **33 years**, and over **80%** of the population resides in urban centers like Bogotá, Medellín, and Cali. This young, tech-savvy population is a primary driver for mobile-first financial services.
+
+-   **Economic Profile (GDP)**: As an upper-middle-income economy, Colombia's GDP is projected at approximately **\$419 billion (2024)**, with a GDP per capita of around **\$7,920**. While broader economic growth hovers around 2–3%, the **digital commerce sector** is outpacing the general economy, expanding at double-digit rates (approx. 12–15% annually).
+
+-   **Financial Inclusion**: Historically, large segments of the Colombian population were "underbanked" due to geographic and cost barriers. However, digital banking has surged; as of 2024, nearly **78% of transactions** in the country are digital. This shift is supported by the National Digital Strategy (2023–2026), which promotes interoperable instant-payment frameworks.
+
+## Our Data
+
+The dataset captures this transition from traditional cash-based behavior to a digital-first economy.
+
+-   **Transactional Data**: Captures the "pulse" of activity across 3.1M+ records, categorized into `Transfer`, `Withdrawal`, and `Payment`.
+
+-   **Customer Profiles**: Includes 54 variables that allow us to see how demographics (like the **income_bracket** or **location**) correlate with **app_logins_frequency** and **satisfaction_score**.
+
+## Data Preparation
+
+Given the scale of the Colombian dataset (116MB CSV), we prepare the data for efficient R-based analysis:
+
+1.  **Compression**: Raw `.csv` files are converted to `.rds` format to fit within GitHub's 100MB limit while maintaining high-speed loading in R.
+
+2.  **Relational Integration**: We join the transactional "Fact" table with the customer "Dimension" table using `customer_id`.
+
+3.  **Variable Encoding**: Categorical metrics (e.g., `acquisition_channel`, `clv_segment`) are converted to factors to facilitate the **Confirmatory Data Analysis (CDA)** phase.
+
+```{r}
+library(tidyverse)
+
+# 1. Load the raw data
+transactions_raw <- read_csv("data/transactions_data.csv")
+customer_raw <- read_csv("data/customer_data.csv")
+
+# 2. Save as RDS (This will likely shrink the 116MB file to <25MB)
+saveRDS(transactions_raw, "data/transactions_data.rds")
+saveRDS(customer_raw, "data/customer_data.rds")
+
+# Load the lightweight RDS files
+transactions <- readRDS("data/transactions_data.rds")
+customers <- readRDS("data/customer_data.rds")
+
+# Prepare Master Data Frame
+master_df <- transactions %>%
+  mutate(date = as.Date(date, format = "%m/%d/%Y")) %>%
+  left_join(customers, by = "customer_id")
+```
+
+# The "Pulse" of the Fintech (Temporal Analysis)
+
+Before looking at individuals, look at the ecosystem. Since your data covers all of 2023, you want to see the "heartbeat" of Colombian digital finance.
+
+-   **What to do:** Plot daily and monthly transaction volumes.
+
+-   **Observation:** Look for "Payday Peaks" (usually the 15th and 30th of the month in Colombia) and holiday surges (December).
+
+-   **Tech Suggestion:** Use `ggplotly()` on a line chart so you can hover over specific days to see the exact transaction count.
+
+## Daily Pulse (Line Chart)
+
+```{r}
+# 1. Load Libraries
+# Load required libraries
+library(tidyverse)
+library(lubridate)
+
+# 1. Load Data
+transactions <- readRDS("data/transactions_data.rds")
+
+# 2. Prep Daily Data
+daily_vol <- transactions %>%
+  mutate(date = as.Date(date, format = "%m/%d/%Y")) %>%
+  group_by(date) %>%
+  summarise(tx_count = n())
+
+# 3. Plot Daily Pulse
+ggplot(daily_vol, aes(x = date, y = tx_count)) +
+  geom_line(color = "#2c3e50", size = 0.5) +
+  # Adding a trend line to see the big picture
+  geom_smooth(method = "loess", span = 0.1, color = "#e74c3c", se = FALSE) +
+  labs(title = "Daily Transaction Pulse (2023)",
+       subtitle = "The red line indicates the 12-month moving trend",
+       x = "Month", y = "Transaction Count") +
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+  theme_minimal()
+```
+
+## Average Volume by Day of Month (Bar Chart)
+
+```{r}
+# 1. Prep Day-of-Month Data
+# First, get the count for every unique day in the calendar
+library(tidyverse)
+library(lubridate)
+
+# 1. Load Data
+transactions <- readRDS("data/transactions_data.rds")
+
+# 2. Preparation (Normalization Logic)
+day_counts <- transactions %>%
+  mutate(date = as.Date(date, format = "%m/%d/%Y"),
+         day_of_month = mday(date)) %>%
+  group_by(date, day_of_month) %>%
+  summarise(daily_total = n(), .groups = "drop")
+
+avg_payday_pulse <- day_counts %>%
+  group_by(day_of_month) %>%
+  summarise(avg_transactions = mean(daily_total))
+
+# 3. Plot with Zoomed Y-Axis
+ggplot(avg_payday_pulse, aes(x = day_of_month, y = avg_transactions)) +
+  geom_col(fill = "#3498db", color = "white") + 
+  scale_x_continuous(breaks = 1:31) +
+  # This line starts the view at 7,500 and lets the top adjust automatically
+  coord_cartesian(ylim = c(5000, 8900)) +
+  labs(title = "Average Daily Transaction Volume by Day of Month",
+       x = "Day of Month", 
+       y = "Mean Transactions per Day") +
+  theme_minimal()
+```
+
+# Demographic & Geographic Adoption
+
+With 48,000+ customers across cities like Bogotá, Medellín, and Cali, we need to see who is actually using the app.
+
+-   **Treemap:** Transaction volume by `location`. (Is Bogotá dominating, or are smaller cities like Pereira showing higher growth per capita?)
+
+## Top 10 Cities by User Base
+
+```{r}
+library(tidyverse)
+
+# 1. Load Customer Data
+customers <- readRDS("data/customer_data.rds")
+
+# 2. Process Location Data
+# Splitting "City, Department" and counting users
+city_dist <- customers %>%
+  separate(location, into = c("city", "department"), sep = ", ") %>%
+  group_by(city) %>%
+  summarise(user_count = n()) %>%
+  arrange(desc(user_count)) %>%
+  slice_head(n = 10)
+
+# 3. Static Bar Chart
+ggplot(city_dist, aes(x = reorder(city, user_count), y = user_count)) +
+  geom_col(fill = "#2ecc71", color = "white") +
+  coord_flip() + # Flip for better readability of city names
+  labs(title = "Top 10 Colombian Cities by User Base",
+       subtitle = "Concentration of the 48,723 unique customers",
+       x = "City", 
+       y = "Number of Customers") +
+  theme_minimal()
+```
+
+## Treemap of Customer Distribution
+
+```{r}
+pacman::p_load(treemap,treemapify)
+```
+
+```{r}
+
+library(tidyverse)
+library(treemap)
+library(treemapify)
+
+geo_data <- customers %>%
+  separate(location, into = c("city", "department"), sep = ", ") %>%
+  group_by(department, city) %>%
+  summarise(user_count = n(), .groups = "drop")
+
+# 3. Create the Treemap
+# Following the 'treemap' package syntax from R4VA
+treemap(geo_data,
+        index = c("department", "city"), # Hierarchy: Dept first, then City
+        vSize = "user_count",            # Size based on number of users
+        type = "index",                  # Color based on index levels
+        title = "Geographic Distribution of Customers in Colombia",
+        palette = "Set3",                # Professional color palette
+        border.col = c("black", "white"),# Distinct borders for levels
+        border.lwds = c(3, 1),           # Thicker borders for Departments
+        fontsize.labels = c(12, 8),      # Larger font for Dept, smaller for City
+        fontcolor.labels = "black",
+        inflate.labels = FALSE)
+```
