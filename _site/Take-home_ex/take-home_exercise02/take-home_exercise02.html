@@ -225,6 +225,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#top-10-cities-by-user-base" id="toc-top-10-cities-by-user-base" class="nav-link" data-scroll-target="#top-10-cities-by-user-base">Top 10 Cities by User Base</a></li>
   <li><a href="#treemap-of-customer-distribution" id="toc-treemap-of-customer-distribution" class="nav-link" data-scroll-target="#treemap-of-customer-distribution">Treemap of Customer Distribution</a></li>
   </ul></li>
+  <li><a href="#behavioral-segmentation" id="toc-behavioral-segmentation" class="nav-link" data-scroll-target="#behavioral-segmentation">Behavioral Segmentation</a>
+  <ul class="collapse">
+  <li><a href="#statistical-analysis-of-product-adoption" id="toc-statistical-analysis-of-product-adoption" class="nav-link" data-scroll-target="#statistical-analysis-of-product-adoption">Statistical Analysis of Product Adoption</a></li>
+  <li><a href="#boxplot-of-monthly-transactions-by-segment" id="toc-boxplot-of-monthly-transactions-by-segment" class="nav-link" data-scroll-target="#boxplot-of-monthly-transactions-by-segment">Boxplot of Monthly Transactions by Segment</a></li>
+  </ul></li>
+  <li><a href="#satisfaction-churn-analysis" id="toc-satisfaction-churn-analysis" class="nav-link" data-scroll-target="#satisfaction-churn-analysis">Satisfaction &amp; Churn Analysis</a>
+  <ul class="collapse">
+  <li><a href="#average-satisfaction-score-by-segment" id="toc-average-satisfaction-score-by-segment" class="nav-link" data-scroll-target="#average-satisfaction-score-by-segment">Average Satisfaction Score by Segment</a></li>
+  <li><a href="#average-churn-probability-by-segment" id="toc-average-churn-probability-by-segment" class="nav-link" data-scroll-target="#average-churn-probability-by-segment">Average Churn Probability by Segment</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -371,7 +381,7 @@ date  (5): first_tx, last_tx, last_survey_date, last_transaction_date, first...
 </section>
 <section id="the-pulse-of-the-fintech-temporal-analysis" class="level1">
 <h1>The “Pulse” of the Fintech (Temporal Analysis)</h1>
-<p>Before looking at individuals, look at the ecosystem. Since your data covers all of 2023, you want to see the “heartbeat” of Colombian digital finance.</p>
+<p>Visualize the “heartbeat” of Colombian digital finance.</p>
 <ul>
 <li><p><strong>What to do:</strong> Plot daily and monthly transaction volumes.</p></li>
 <li><p><strong>Observation:</strong> Look for “Payday Peaks” (usually the 15th and 30th of the month in Colombia) and holiday surges (December).</p></li>
@@ -464,10 +474,8 @@ date  (5): first_tx, last_tx, last_survey_date, last_transaction_date, first...
 </section>
 <section id="demographic-geographic-adoption" class="level1">
 <h1>Demographic &amp; Geographic Adoption</h1>
-<p>With 48,000+ customers across cities like Bogotá, Medellín, and Cali, we need to see who is actually using the app.</p>
-<ul>
-<li><strong>Treemap:</strong> Transaction volume by <code>location</code>. (Is Bogotá dominating, or are smaller cities like Pereira showing higher growth per capita?)</li>
-</ul>
+<p>To see who is actually using the with 48,000+ customers across cities like Bogotá, Medellín, and Cali.</p>
+<p><strong>Treemap:</strong> Transaction volume by <code>location</code>. (Is Bogotá dominating, or are smaller cities like Pereira showing higher growth per capita?)</p>
 <section id="top-10-cities-by-user-base" class="level2">
 <h2 class="anchored" data-anchor-id="top-10-cities-by-user-base">Top 10 Cities by User Base</h2>
 <div class="cell">
@@ -535,6 +543,146 @@ date  (5): first_tx, last_tx, last_survey_date, last_transaction_date, first...
 <div>
 <figure class="figure">
 <p><img src="take-home_exercise02_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="behavioral-segmentation" class="level1">
+<h1>Behavioral Segmentation</h1>
+<section id="statistical-analysis-of-product-adoption" class="level2">
+<h2 class="anchored" data-anchor-id="statistical-analysis-of-product-adoption">Statistical Analysis of Product Adoption</h2>
+<p>This chart answers: <em>“Do ‘Power’ users actually hold more active products than ‘Regular’ or ‘Inactive’ users, and is the difference statistically significant?”</em></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Load Libraries</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggstatsplot)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'ggstatsplot' was built under R version 4.4.3</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>You can cite this package as:
+     Patil, I. (2021). Visualizations with statistical details: The 'ggstatsplot' approach.
+     Journal of Open Source Software, 6(61), 3167, doi:10.21105/joss.03167</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Load Customer Data</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>customers <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"data/customer_data.rds"</span>)</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Create Statistical Comparison Plot</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="co"># We use ggbetweenstats to compare 'active_products' across 'customer_segment'</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>) <span class="co"># For reproducibility of jitter points</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a><span class="fu">ggbetweenstats</span>(</span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> customers,</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> customer_segment,</span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> active_products,</span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">"nonparametric"</span>, <span class="co"># Financial behavior is often non-normal</span></span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">plot.type =</span> <span class="st">"boxviolin"</span>,</span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">palette =</span> <span class="st">"Set2"</span>,</span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">title =</span> <span class="st">"Distribution of Active Products by Customer Segment"</span>,</span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlab =</span> <span class="st">"Customer Segment"</span>,</span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">ylab =</span> <span class="st">"Number of Active Products"</span>,</span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">messages =</span> <span class="cn">FALSE</span></span>
+<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="take-home_exercise02_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>There is <strong>no statistically significant difference</strong> in the number of active products between these four segments. Whether a customer is “inactive” or a “power” user, they tend to hold the same variety of products.</p>
+<p>Since product ownership is virtually identical across all groups, “product count” is not the factor driving customer engagement or segment classification in your dataset. A “Power” user isn’t someone who has <em>more</em> products; they likely use their existing products more frequently or generate higher transaction volumes.</p>
+</section>
+<section id="boxplot-of-monthly-transactions-by-segment" class="level2">
+<h2 class="anchored" data-anchor-id="boxplot-of-monthly-transactions-by-segment">Boxplot of Monthly Transactions by Segment</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Create the Boxplot</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(customers, <span class="fu">aes</span>(<span class="at">x =</span> customer_segment, <span class="at">y =</span> monthly_transaction_count)) <span class="sc">+</span></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Using a uniform color as requested</span></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">fill =</span> <span class="st">"#3498db"</span>, <span class="at">color =</span> <span class="st">"#2c3e50"</span>, <span class="at">outlier.alpha =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Zooming in to the 0-10 range so the boxes are actually visible.</span></span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># This is necessary because 75% of users are below 4 transactions.</span></span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">10</span>)) <span class="sc">+</span> </span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">10</span>, <span class="at">by =</span> <span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Monthly Transaction Count by Customer Segment"</span>,</span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">"Zoomed to 0-10 range to show quartile distribution (excluding extreme outliers)"</span>,</span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Customer Segment"</span>,</span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Transactions per Month"</span>) <span class="sc">+</span></span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="take-home_exercise02_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The “thick line” inside each box (the median) will sit at exactly <strong>2</strong> for every single segment. This is the strongest visual proof yet that frequency does not define a “Power” user in this dataset.</p>
+</section>
+</section>
+<section id="satisfaction-churn-analysis" class="level1">
+<h1>Satisfaction &amp; Churn Analysis</h1>
+<section id="average-satisfaction-score-by-segment" class="level2">
+<h2 class="anchored" data-anchor-id="average-satisfaction-score-by-segment">Average Satisfaction Score by Segment</h2>
+<p>This chart checks if “Power” users are simply the most satisfied with the service.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Prepare Data: Calculate Mean Satisfaction</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>sat_summary <span class="ot">&lt;-</span> customers <span class="sc">%&gt;%</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(customer_segment) <span class="sc">%&gt;%</span></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">mean_sat =</span> <span class="fu">mean</span>(satisfaction_score, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Create the Bar Chart</span></span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(sat_summary, <span class="fu">aes</span>(<span class="at">x =</span> customer_segment, <span class="at">y =</span> mean_sat)) <span class="sc">+</span></span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"#3498db"</span>, <span class="at">color =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Adding text labels to show the extreme similarity</span></span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">round</span>(mean_sat, <span class="dv">2</span>)), <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">4</span>) <span class="sc">+</span></span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Average Satisfaction Score by Customer Segment"</span>,</span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">"Finding: Emotional sentiment is consistent across all four user categories"</span>,</span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Customer Segment"</span>, </span>
+<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Mean Satisfaction Score (1-5)"</span>) <span class="sc">+</span></span>
+<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Zooming y-axis slightly to see the tiny differences</span></span>
+<span id="cb30-18"><a href="#cb30-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">5</span>)) <span class="sc">+</span> </span>
+<span id="cb30-19"><a href="#cb30-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="take-home_exercise02_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="average-churn-probability-by-segment" class="level2">
+<h2 class="anchored" data-anchor-id="average-churn-probability-by-segment">Average Churn Probability by Segment</h2>
+<p>This chart examines if “Power” status is a marker for loyalty (lower churn risk).</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Prepare Data: Calculate Mean Churn Probability</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>churn_summary <span class="ot">&lt;-</span> customers <span class="sc">%&gt;%</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(customer_segment) <span class="sc">%&gt;%</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">mean_churn =</span> <span class="fu">mean</span>(churn_probability, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Create the Bar Chart</span></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(churn_summary, <span class="fu">aes</span>(<span class="at">x =</span> customer_segment, <span class="at">y =</span> mean_churn)) <span class="sc">+</span></span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"#e74c3c"</span>, <span class="at">color =</span> <span class="st">"white"</span>) <span class="sc">+</span> <span class="co"># Using red for 'Risk' metrics</span></span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">round</span>(mean_churn, <span class="dv">3</span>)), <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">4</span>) <span class="sc">+</span></span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Average Churn Probability by Customer Segment"</span>,</span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">"Finding: Power users are just as likely to churn as Inactive users"</span>,</span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Customer Segment"</span>, </span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Mean Churn Probability (0-1)"</span>) <span class="sc">+</span></span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.5</span>)) <span class="sc">+</span></span>
+<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="take-home_exercise02_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
