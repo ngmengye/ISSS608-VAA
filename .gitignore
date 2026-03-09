@@ -7,3 +7,6 @@
 
 /.quarto/
 **/*.quarto_ipynb
+
+transactions_data.csv
+customer_data.csv

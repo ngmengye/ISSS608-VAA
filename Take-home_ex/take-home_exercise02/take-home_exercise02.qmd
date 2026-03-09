@@ -58,7 +58,7 @@ master_df <- transactions %>%
 
 # The "Pulse" of the Fintech (Temporal Analysis)
 
-Before looking at individuals, look at the ecosystem. Since your data covers all of 2023, you want to see the "heartbeat" of Colombian digital finance.
+Visualize the "heartbeat" of Colombian digital finance.
 
 -   **What to do:** Plot daily and monthly transaction volumes.
 
@@ -131,9 +131,9 @@ ggplot(avg_payday_pulse, aes(x = day_of_month, y = avg_transactions)) +
 
 # Demographic & Geographic Adoption
 
-With 48,000+ customers across cities like Bogotá, Medellín, and Cali, we need to see who is actually using the app.
+To see who is actually using the with 48,000+ customers across cities like Bogotá, Medellín, and Cali.
 
--   **Treemap:** Transaction volume by `location`. (Is Bogotá dominating, or are smaller cities like Pereira showing higher growth per capita?)
+**Treemap:** Transaction volume by `location`. (Is Bogotá dominating, or are smaller cities like Pereira showing higher growth per capita?)
 
 ## Top 10 Cities by User Base
 
@@ -193,4 +193,113 @@ treemap(geo_data,
         fontsize.labels = c(12, 8),      # Larger font for Dept, smaller for City
         fontcolor.labels = "black",
         inflate.labels = FALSE)
+```
+
+# Behavioral Segmentation
+
+## Statistical Analysis of Product Adoption
+
+This chart answers: *"Do 'Power' users actually hold more active products than 'Regular' or 'Inactive' users, and is the difference statistically significant?"*
+
+```{r}
+# 1. Load Libraries
+library(tidyverse)
+library(ggstatsplot)
+
+# 2. Load Customer Data
+customers <- readRDS("data/customer_data.rds")
+
+# 3. Create Statistical Comparison Plot
+# We use ggbetweenstats to compare 'active_products' across 'customer_segment'
+set.seed(123) # For reproducibility of jitter points
+
+ggbetweenstats(
+  data = customers,
+  x = customer_segment,
+  y = active_products,
+  type = "nonparametric", # Financial behavior is often non-normal
+  plot.type = "boxviolin",
+  palette = "Set2",
+  title = "Distribution of Active Products by Customer Segment",
+  xlab = "Customer Segment",
+  ylab = "Number of Active Products",
+  messages = FALSE
+)
+```
+
+There is **no statistically significant difference** in the number of active products between these four segments. Whether a customer is "inactive" or a "power" user, they tend to hold the same variety of products.
+
+Since product ownership is virtually identical across all groups, "product count" is not the factor driving customer engagement or segment classification in your dataset. A "Power" user isn't someone who has *more* products; they likely use their existing products more frequently or generate higher transaction volumes.
+
+## Boxplot of Monthly Transactions by Segment
+
+```{r}
+library(tidyverse)
+
+
+# 2. Create the Boxplot
+ggplot(customers, aes(x = customer_segment, y = monthly_transaction_count)) +
+  # Using a uniform color as requested
+  geom_boxplot(fill = "#3498db", color = "#2c3e50", outlier.alpha = 0.2) +
+  # Zooming in to the 0-10 range so the boxes are actually visible.
+  # This is necessary because 75% of users are below 4 transactions.
+  coord_cartesian(ylim = c(0, 10)) + 
+  scale_y_continuous(breaks = seq(0, 10, by = 1)) +
+  labs(title = "Monthly Transaction Count by Customer Segment",
+       subtitle = "Zoomed to 0-10 range to show quartile distribution (excluding extreme outliers)",
+       x = "Customer Segment",
+       y = "Transactions per Month") +
+  theme_minimal()
+```
+
+The "thick line" inside each box (the median) will sit at exactly **2** for every single segment. This is the strongest visual proof yet that frequency does not define a "Power" user in this dataset.
+
+# Satisfaction & Churn Analysis
+
+## Average Satisfaction Score by Segment
+
+This chart checks if "Power" users are simply the most satisfied with the service.
+
+```{r}
+library(tidyverse)
+
+# 2. Prepare Data: Calculate Mean Satisfaction
+sat_summary <- customers %>%
+  group_by(customer_segment) %>%
+  summarise(mean_sat = mean(satisfaction_score, na.rm = TRUE))
+
+# 3. Create the Bar Chart
+ggplot(sat_summary, aes(x = customer_segment, y = mean_sat)) +
+  geom_col(fill = "#3498db", color = "white") +
+  # Adding text labels to show the extreme similarity
+  geom_text(aes(label = round(mean_sat, 2)), vjust = -0.5, size = 4) +
+  labs(title = "Average Satisfaction Score by Customer Segment",
+       subtitle = "Finding: Emotional sentiment is consistent across all four user categories",
+       x = "Customer Segment", 
+       y = "Mean Satisfaction Score (1-5)") +
+  # Zooming y-axis slightly to see the tiny differences
+  coord_cartesian(ylim = c(0, 5)) + 
+  theme_minimal()
+```
+
+## Average Churn Probability by Segment
+
+This chart examines if "Power" status is a marker for loyalty (lower churn risk).
+
+```{r}
+# 1. Prepare Data: Calculate Mean Churn Probability
+churn_summary <- customers %>%
+  group_by(customer_segment) %>%
+  summarise(mean_churn = mean(churn_probability, na.rm = TRUE))
+
+# 2. Create the Bar Chart
+ggplot(churn_summary, aes(x = customer_segment, y = mean_churn)) +
+  geom_col(fill = "#e74c3c", color = "white") + # Using red for 'Risk' metrics
+  geom_text(aes(label = round(mean_churn, 3)), vjust = -0.5, size = 4) +
+  labs(title = "Average Churn Probability by Customer Segment",
+       subtitle = "Finding: Power users are just as likely to churn as Inactive users",
+       x = "Customer Segment", 
+       y = "Mean Churn Probability (0-1)") +
+  coord_cartesian(ylim = c(0, 0.5)) +
+  theme_minimal()
 ```
