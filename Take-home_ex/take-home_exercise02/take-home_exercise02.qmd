@@ -70,4 +70,120 @@ master_df <- transactions %>%
   left_join(customers, by = "customer_id")
 ```
 
-# 
+The code chunk below will be used to install and load these packages in RStudio.
+
+```{r}
+#| warning: false
+#| message: false
+pacman::p_load("ggstatsplot", "plotly", "DT", "scales","tidyverse")
+```
+
+# Correlation
+
+## Analyzing how different categories affects the Transaction Amount vs. Frequency behavior
+
+### 1. Education Level
+
+The function 'a' is the socio-demographic factor (e.g., "gender", "income_bracket")
+
+```{r}
+options(scipen = 999)
+
+plot_behavior_correlation <- function(a) {
+  ggscatterstats(
+    data = customers, 
+    x = avg_tx_value,  
+    y = tx_count,
+    type = "nonparametric", 
+    title = paste("Socio-Demographic Factor Analysis:", a),
+    xlab = "Average Transaction $",
+    ylab = "Transaction Frequency"
+  ) + 
+    facet_wrap(vars(!!sym(a))) +
+    # This part cleans the x-axis
+    scale_x_continuous(
+      labels = label_number(scale = 1e-6, suffix = "M"),
+      breaks = seq(0, 50000000, by = 10000000) # Optional: set breaks every 10M
+    )
+}
+```
+
+```{r}
+#| warning: false
+#| message: false
+plot_behavior_correlation("education_level")
+```
+
+### 2. Marital Status
+
+```{r}
+#| warning: false
+#| message: false
+plot_behavior_correlation("marital_status")
+```
+
+### 3. Gender
+
+```{r}
+#| warning: false
+#| message: false
+plot_behavior_correlation("gender")
+```
+
+###  4. Age
+
+```{r}
+library(dplyr)
+
+customers <- customers %>%
+  mutate(age_group = case_when(
+    age <= 35 ~ "20-35", # Assuming the youngest users start around 20
+    age >= 36 & age <= 50 ~ "36-50",
+    age >= 51 & age <= 65 ~ "51-65",
+    age > 65  ~ "65+",
+    TRUE      ~ "Others"
+  )) %>%
+  # Re-ordering the factors for the plot
+  mutate(age_group = factor(age_group, 
+                            levels = c("20-35", "36-50", "51-65", "65+")))
+```
+
+```{r}
+#| warning: false
+#| message: false
+plot_behavior_correlation("age_group")
+```
+
+### 5. Income Bracket
+
+```{r}
+#| warning: false
+#| message: false
+plot_behavior_correlation("income_bracket")
+
+```
+
+### 6. Household Size
+
+```{r}
+
+customers <- customers %>%
+  mutate(hh_group = case_when(
+    household_size == 1 ~ "1",
+    household_size >= 2 & household_size <= 3 ~ "2-3",
+    household_size >= 4 & household_size <= 5 ~ "4-5",
+    household_size >= 6 ~ "6+",
+    TRUE ~ "Unknown"
+  )) %>%
+  # Set levels to ensure the plot follows the correct order
+  mutate(hh_group = factor(hh_group, 
+                           levels = c("1", "2-3", "4-5", "6+")))
+
+```
+
+```{r}
+#| warning: false
+#| message: false
+plot_behavior_correlation("hh_group")
+
+```

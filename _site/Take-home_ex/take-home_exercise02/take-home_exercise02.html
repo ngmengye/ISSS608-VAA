@@ -217,7 +217,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#our-data" id="toc-our-data" class="nav-link" data-scroll-target="#our-data">Our Data</a></li>
   <li><a href="#data-preparation" id="toc-data-preparation" class="nav-link" data-scroll-target="#data-preparation">Data Preparation</a></li>
   </ul></li>
-  <li><a href="#section" id="toc-section" class="nav-link" data-scroll-target="#section"></a></li>
+  <li><a href="#correlation" id="toc-correlation" class="nav-link" data-scroll-target="#correlation">Correlation</a>
+  <ul class="collapse">
+  <li><a href="#analyzing-how-education-level-affects-the-transaction-amount-vs.-frequency-behavior" id="toc-analyzing-how-education-level-affects-the-transaction-amount-vs.-frequency-behavior" class="nav-link" data-scroll-target="#analyzing-how-education-level-affects-the-transaction-amount-vs.-frequency-behavior">Analyzing how <em>Education Level</em> affects the Transaction Amount vs.&nbsp;Frequency behavior</a></li>
+  <li><a href="#analyzing-how-marital-status-affects-the-transaction-amount-vs.-frequency-behavior" id="toc-analyzing-how-marital-status-affects-the-transaction-amount-vs.-frequency-behavior" class="nav-link" data-scroll-target="#analyzing-how-marital-status-affects-the-transaction-amount-vs.-frequency-behavior">Analyzing how <em>Marital Status</em> affects the Transaction Amount vs.&nbsp;Frequency behavior</a></li>
+  <li><a href="#analyzing-how-gender-affects-the-transaction-amount-vs.-frequency-behavior" id="toc-analyzing-how-gender-affects-the-transaction-amount-vs.-frequency-behavior" class="nav-link" data-scroll-target="#analyzing-how-gender-affects-the-transaction-amount-vs.-frequency-behavior">Analyzing how <em>Gender</em> affects the Transaction Amount vs.&nbsp;Frequency behavior</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -309,12 +314,81 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">date =</span> <span class="fu">as.Date</span>(date, <span class="at">format =</span> <span class="st">"%m/%d/%Y"</span>)) <span class="sc">%&gt;%</span></span>
 <span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(customers, <span class="at">by =</span> <span class="st">"customer_id"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
+<p>The code chunk below will be used to install and load these packages in RStudio.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(<span class="st">"ggstatsplot"</span>, <span class="st">"plotly"</span>, <span class="st">"DT"</span>, <span class="st">"scales"</span>,<span class="st">"tidyverse"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
 </section>
 </section>
-<section id="section" class="level1">
-<h1></h1>
+<section id="correlation" class="level1">
+<h1>Correlation</h1>
+<section id="analyzing-how-education-level-affects-the-transaction-amount-vs.-frequency-behavior" class="level2">
+<h2 class="anchored" data-anchor-id="analyzing-how-education-level-affects-the-transaction-amount-vs.-frequency-behavior">Analyzing how <em>Education Level</em> affects the Transaction Amount vs.&nbsp;Frequency behavior</h2>
+<p>The function ‘a’ is the socio-demographic factor (e.g., “gender”, “income_bracket”)</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">scipen =</span> <span class="dv">999</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>plot_behavior_correlation <span class="ot">&lt;-</span> <span class="cf">function</span>(a) {</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggscatterstats</span>(</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> customers, </span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> avg_tx_value,  </span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> tx_count,</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">type =</span> <span class="st">"nonparametric"</span>, </span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="fu">paste</span>(<span class="st">"Socio-Demographic Factor Analysis:"</span>, a),</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">xlab =</span> <span class="st">"Average Transaction $"</span>,</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">ylab =</span> <span class="st">"Transaction Frequency"</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span> </span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">facet_wrap</span>(<span class="fu">vars</span>(<span class="sc">!!</span><span class="fu">sym</span>(a))) <span class="sc">+</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># This part cleans the x-axis</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_x_continuous</span>(</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>      <span class="at">labels =</span> <span class="fu">label_number</span>(<span class="at">scale =</span> <span class="fl">1e-6</span>, <span class="at">suffix =</span> <span class="st">"M"</span>),</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>      <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">50000000</span>, <span class="at">by =</span> <span class="dv">10000000</span>) <span class="co"># Optional: set breaks every 10M</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_behavior_correlation</span>(<span class="st">"education_level"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="take-home_exercise02_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The p-value = 0.00069, the result is <strong>statistically significant</strong>. There is a genuine relationship between transaction frequency and transaction amount across different education levels.</p>
+<p>Spearman’s Rho = 0.02. This is a <strong>very weak positive</strong> correlation. Generally, as transaction frequency increases, the average amount slightly increases, but the relationship is so weak that knowing one doesn’t really help to predict the other. In a fintech context, this suggests that high-frequency users (power users) aren’t necessarily the ones spending the largest amounts</p>
+</section>
+<section id="analyzing-how-marital-status-affects-the-transaction-amount-vs.-frequency-behavior" class="level2">
+<h2 class="anchored" data-anchor-id="analyzing-how-marital-status-affects-the-transaction-amount-vs.-frequency-behavior">Analyzing how <em>Marital Status</em> affects the Transaction Amount vs.&nbsp;Frequency behavior</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_behavior_correlation</span>(<span class="st">"marital_status"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="take-home_exercise02_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The analysis shows a statistically significant but <strong>negligible positive relationship (Spearman ρ = 0.02)</strong> between average transaction amount and transaction frequency across marital status groups. Visual inspection confirms that most customers cluster at low transaction values and frequencies, with a few extreme outliers. The pattern is consistent across divorced, married, single, and widowed groups, suggesting <strong>marital status does not meaningfully affect transaction behavior</strong>.</p>
+</section>
+<section id="analyzing-how-gender-affects-the-transaction-amount-vs.-frequency-behavior" class="level2">
+<h2 class="anchored" data-anchor-id="analyzing-how-gender-affects-the-transaction-amount-vs.-frequency-behavior">Analyzing how <em>Gender</em> affects the Transaction Amount vs.&nbsp;Frequency behavior</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_behavior_correlation</span>(<span class="st">"gender"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="take-home_exercise02_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The analysis shows a statistically significant but negligible positive relationship (Spearman ρ = 0.02) between average transaction value and transaction frequency across gender groups. Visual inspection of the marginal histograms confirms a heavy right-skew, with the vast majority of users—regardless of gender—clustering at low transaction values and frequencies. While extreme outliers exist, such as a high-frequency female “power user” and high-value male transactions, the overall pattern remains consistent across Female, Male, and Other groups, suggesting gender is not a primary differentiator for transaction behavior in this fintech ecosystem.</p>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
