@@ -78,9 +78,9 @@ The code chunk below will be used to install and load these packages in RStudio.
 pacman::p_load("ggstatsplot", "plotly", "DT", "scales","tidyverse")
 ```
 
-# Correlation
+# Exploratory Data Analysis
 
-## Analyzing how different categories affects the Transaction Amount vs. Frequency behavior
+Analyzing how different categories affects the Transaction Amount vs. Frequency behavior
 
 ### 1. Education Level
 
@@ -185,5 +185,69 @@ customers <- customers %>%
 #| warning: false
 #| message: false
 plot_behavior_correlation("hh_group")
+
+```
+
+## State Comparison
+
+```{r}
+library(tidyr)
+
+customers <- customers %>%
+  separate(location, into = c("city", "state"), sep = ", ", remove = FALSE)
+```
+
+```{r}
+p_dept <- ggplot(data = customers %>% 
+                   filter(state == "Antioquia") %>% # Example: Filter for Antioquia state
+                   group_by(income_bracket), 
+                 aes(y = total_tx_volume, x = age_group)) + 
+  geom_boxplot(aes(fill = income_bracket)) + 
+  scale_fill_brewer(palette = "YlGnBu")  +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)) + 
+  scale_y_continuous(labels = comma)
+```
+
+```{r}
+p_dept %>% 
+  ggplotly() %>% 
+  layout(boxmode = "group")
+```
+
+```{r}
+customers_filtered <- customers %>%
+  filter(state == "Antioquia") %>%
+  group_by(age_group, income_bracket) %>%
+  mutate(
+    Q1 = quantile(total_tx_volume, 0.25),
+    Q3 = quantile(total_tx_volume, 0.75),
+    IQR = Q3 - Q1,
+    upper_limit = Q3 + 1.5 * IQR,
+    lower_limit = Q1 - 1.5 * IQR
+  ) %>%
+  filter(total_tx_volume >= lower_limit & total_tx_volume <= upper_limit)
+
+
+p_dept <- ggplot(data = customers_filtered %>% 
+                   filter(state == "Antioquia") %>% # Example: Filter for Antioquia state
+                   group_by(income_bracket), 
+                 aes(y = total_tx_volume, x = age_group)) + 
+  geom_boxplot(aes(fill = income_bracket)) + 
+  scale_fill_brewer(palette = "YlGnBu")  +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)) + 
+  scale_y_continuous(labels = comma)
+```
+
+```{r}
+p_dept %>% 
+  ggplotly() %>% 
+  layout(boxmode = "group")
+```
+
+# Confirmatory Data Analysis
+
+### Data Overview
+
+```{r}
 
 ```
