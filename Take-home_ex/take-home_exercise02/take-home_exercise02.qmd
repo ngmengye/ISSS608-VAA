@@ -9,16 +9,6 @@ author: "Ng Meng Ye"
 
 The objective of this project is to understand the **behaviors behind customer transactions** and how **socio-demographic factors**—such as age, income, and occupation—affect customer transactions. By applying statistical correlation techniques, we aim to identify which personal attributes are the true drivers of financial activity within the Colombian fintech ecosystem.
 
-## Regional Context: Socio-Demographic Diversity
-
-Colombia’s unique social structure provides a rich environment for demographic behavioral analysis:
-
--   **Urban-Rural Divide**: Economic activity is heavily concentrated in the "Golden Triangle" of **Bogotá, Medellín, and Cali**. We investigate if geography is a primary factor in transaction frequency or if digital adoption has bridged the regional gap.
-
--   **The Emerging Middle Class**: With a median age of **33**, the Colombian workforce is transitioning into digital-first banking. This project evaluates how **income brackets** and **education levels** correlate with transaction volumes to see if wealth is a prerequisite for high engagement.
-
--   **Professional Variance**: From independent freelancers to corporate engineers, we analyze how **occupational status** acts as a factor in how frequently users interact with their digital wallets.
-
 ## Analytical Framework: Socio-Demographic Correlation
 
 To isolate the influence of these factors, we utilize a **Correlation-First** approach:
@@ -33,41 +23,23 @@ To isolate the influence of these factors, we utilize a **Correlation-First** ap
 
 The dataset captures this transition from traditional cash-based behavior to a digital-first economy.
 
--   **Transactional Data**: Captures the "pulse" of activity across 3.1M+ records, categorized into `Transfer`, `Withdrawal`, and `Payment`.
-
--   **Customer Profiles**: Includes 54 variables that allow us to see how demographics (like the **income_bracket** or **location**) correlate with **app_logins_frequency** and **satisfaction_score**.
+-   **Customer Profiles**: Includes 54 variables that allow us to see how demographics (like the **income_bracket** or **location**) correlate with **tx_count** and **avg_tx_value**.
 
 ## Data Preparation
 
-Given the scale of the Colombian dataset (116MB CSV), we prepare the data for efficient R-based analysis:
-
-1.  **Compression**: Raw `.csv` files are converted to `.rds` format to fit within GitHub's 100MB limit while maintaining high-speed loading in R.
-
-2.  **Relational Integration**: We join the transactional "Fact" table with the customer "Dimension" table using `customer_id`.
-
-3.  **Variable Encoding**: Categorical metrics (e.g., `acquisition_channel`, `clv_segment`) are converted to factors to facilitate the **Confirmatory Data Analysis (CDA)** phase.
+Raw `.csv` files are converted to `.rds` format to fit within GitHub's 100MB limit while maintaining high-speed loading in R.
 
 ```{r}
 #| warning: false
 #| message: false
 library(tidyverse)
 
-# 1. Load the raw data
-transactions_raw <- read_csv("data/transactions_data.csv")
 customer_raw <- read_csv("data/customer_data.csv")
 
-# 2. Save as RDS (This will likely shrink the 116MB file to <25MB)
-saveRDS(transactions_raw, "data/transactions_data.rds")
 saveRDS(customer_raw, "data/customer_data.rds")
 
-# Load the lightweight RDS files
-transactions <- readRDS("data/transactions_data.rds")
 customers <- readRDS("data/customer_data.rds")
 
-# Prepare Master Data Frame
-master_df <- transactions %>%
-  mutate(date = as.Date(date, format = "%m/%d/%Y")) %>%
-  left_join(customers, by = "customer_id")
 ```
 
 The code chunk below will be used to install and load these packages in RStudio.
@@ -80,18 +52,124 @@ pacman::p_load("ggstatsplot", "plotly", "DT", "scales","tidyverse","gtsummary")
 
 # Exploratory Data Analysis
 
+## Data Exploration
+
+```{r}
+library(tidyverse)
+glimpse(customers)
+```
+
+## Data Cleaning
+
+We only keep those columns that are required for our analysis
+
+1.  customer_id
+2.  age
+3.  gender
+4.  location
+5.  income_bracket
+6.  education_level
+7.  household_size
+8.  marital_status
+9.  tx_count
+10. avg_tx_volume
+11. total_tx_volume
+
+```{r}
+library(tidyverse)
+
+# Retaining only the specified columns
+customers_cleaned <- customers %>%
+  select(
+    customer_id,
+    age,
+    gender,
+    location,
+    income_bracket,
+    education_level,
+    household_size,
+    marital_status,
+    tx_count,
+    avg_tx_value,
+    total_tx_volume
+  )
+
+# Verify the result
+glimpse(customers_cleaned)
+```
+
+Create age group
+
+```{r}
+
+customers_cleaned <- customers_cleaned %>%
+  mutate(age_group = case_when(
+    age <= 35 ~ "20-35", # Assuming the youngest users start around 20
+    age >= 36 & age <= 50 ~ "36-50",
+    age >= 51 & age <= 65 ~ "51-65"
+  )) %>%
+  # Re-ordering the factors for the plot
+  mutate(age_group = factor(age_group, 
+                            levels = c("20-35", "36-50", "51-65")))
+```
+
+Create household_size group
+
+```{r}
+
+customers_cleaned <- customers_cleaned %>%
+  mutate(hh_group = case_when(
+    household_size == 1 ~ "1",
+    household_size >= 2 & household_size <= 3 ~ "2-3",
+    household_size >= 4 & household_size <= 5 ~ "4-5",
+    household_size >= 6 ~ "6+",
+    TRUE ~ "Unknown"
+  )) %>%
+  # Set levels to ensure the plot follows the correct order
+  mutate(hh_group = factor(hh_group, 
+                           levels = c("1", "2-3", "4-5", "6+")))
+```
+
+## Descriptive Statistic
+
+Review the statistical summary of the **socio-demographic factors**
+
+```{r}
+library(gt)
+
+descriptive_summary_table <- customers_cleaned %>%
+  select(education_level, marital_status, gender, age_group, 
+         income_bracket, hh_group) %>%
+  tbl_summary(
+    # ... (keep your existing tbl_summary code here)
+  ) %>%
+  as_gt() %>% # Convert gtsummary to gt object
+  tab_header(
+    title = "Socio-Demographic Descriptive Statistics",
+    subtitle = "Colombian Fintech User Base (2023)"
+  ) %>%
+  opt_stylize(color = "blue", style = 1) # Built-in themes
+
+descriptive_summary_table
+```
+
 Analyzing how different categories affects the Transaction Amount vs. Frequency behavior
 
-### 1. Education Level
+1.  Education Level
+2.  Marital Status
+3.  Gender
+4.  Age
+5.  Income Bracket
+6.  Household Size
 
-The function 'a' is the socio-demographic factor (e.g., "gender", "income_bracket")
+### 1. Education Level
 
 ```{r}
 options(scipen = 999)
 
 plot_behavior_correlation <- function(a) {
   ggscatterstats(
-    data = customers, 
+    data = customers_cleaned, 
     x = avg_tx_value,  
     y = tx_count,
     type = "nonparametric", 
@@ -133,22 +211,6 @@ plot_behavior_correlation("gender")
 ### 4. Age
 
 ```{r}
-library(dplyr)
-
-customers <- customers %>%
-  mutate(age_group = case_when(
-    age <= 35 ~ "20-35", # Assuming the youngest users start around 20
-    age >= 36 & age <= 50 ~ "36-50",
-    age >= 51 & age <= 65 ~ "51-65",
-    age > 65  ~ "65+",
-    TRUE      ~ "Others"
-  )) %>%
-  # Re-ordering the factors for the plot
-  mutate(age_group = factor(age_group, 
-                            levels = c("20-35", "36-50", "51-65", "65+")))
-```
-
-```{r}
 #| warning: false
 #| message: false
 plot_behavior_correlation("age_group")
@@ -160,26 +222,9 @@ plot_behavior_correlation("age_group")
 #| warning: false
 #| message: false
 plot_behavior_correlation("income_bracket")
-
 ```
 
 ### 6. Household Size
-
-```{r}
-
-customers <- customers %>%
-  mutate(hh_group = case_when(
-    household_size == 1 ~ "1",
-    household_size >= 2 & household_size <= 3 ~ "2-3",
-    household_size >= 4 & household_size <= 5 ~ "4-5",
-    household_size >= 6 ~ "6+",
-    TRUE ~ "Unknown"
-  )) %>%
-  # Set levels to ensure the plot follows the correct order
-  mutate(hh_group = factor(hh_group, 
-                           levels = c("1", "2-3", "4-5", "6+")))
-
-```
 
 ```{r}
 #| warning: false
@@ -188,102 +233,6 @@ plot_behavior_correlation("hh_group")
 
 ```
 
-## State Comparison
-
-```{r}
-library(tidyr)
-
-customers <- customers %>%
-  separate(location, into = c("city", "state"), sep = ", ", remove = FALSE)
-```
-
-```{r}
-p_dept <- ggplot(data = customers %>% 
-                   filter(state == "Antioquia") %>% # Example: Filter for Antioquia state
-                   group_by(income_bracket), 
-                 aes(y = total_tx_volume, x = age_group)) + 
-  geom_boxplot(aes(fill = income_bracket)) + 
-  scale_fill_brewer(palette = "YlGnBu")  +
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)) + 
-  scale_y_continuous(labels = comma)
-```
-
-```{r}
-p_dept %>% 
-  ggplotly() %>% 
-  layout(boxmode = "group")
-```
-
-```{r}
-customers_filtered <- customers %>%
-  filter(state == "Antioquia") %>%
-  group_by(age_group, income_bracket) %>%
-  mutate(
-    Q1 = quantile(total_tx_volume, 0.25),
-    Q3 = quantile(total_tx_volume, 0.75),
-    IQR = Q3 - Q1,
-    upper_limit = Q3 + 1.5 * IQR,
-    lower_limit = Q1 - 1.5 * IQR
-  ) %>%
-  filter(total_tx_volume >= lower_limit & total_tx_volume <= upper_limit)
-
-
-p_dept <- ggplot(data = customers_filtered %>% 
-                   filter(state == "Antioquia") %>% # Example: Filter for Antioquia state
-                   group_by(income_bracket), 
-                 aes(y = total_tx_volume, x = age_group)) + 
-  geom_boxplot(aes(fill = income_bracket)) + 
-  scale_fill_brewer(palette = "YlGnBu")  +
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)) + 
-  scale_y_continuous(labels = comma)
-```
-
-```{r}
-p_dept %>% 
-  ggplotly() %>% 
-  layout(boxmode = "group")
-```
-
 # Confirmatory Data Analysis
 
-### Data Overview
-
-### Descriptive Statistics
-
-```{r}
-library(tidyverse)
-library(gtsummary)
-library(DT)
-
-# Select your categories and the target metric
-descriptive_summary <- customers %>%
-  select(education_level, marital_status, gender, age_group, 
-         income_bracket, hh_group, total_tx_volume) %>%
-  # Create the summary table
-  tbl_summary(
-    by = NULL, # You can set this to 'gender' if you want to compare columns
-    statistic = list(
-      all_continuous() ~ "{mean} ({sd}) | {median} ({p25}, {p75})",
-      all_categorical() ~ "{n} ({p}%)"
-    ),
-    digits = all_continuous() ~ 2,
-    label = list(
-      education_level ~ "Education Level",
-      marital_status ~ "Marital Status",
-      gender ~ "Gender",
-      age_group ~ "Age Group",
-      income_bracket ~ "Income Bracket",
-      hh_group ~ "Household Size",
-      total_tx_volume ~ "Total Transaction Volume (COP)"
-    )
-  ) %>%
-  add_n() %>% # Add count of non-missing observations
-  as_tibble()
-
-# Render as an interactive table for your Netlify site
-datatable(descriptive_summary, 
-          class = "hover", 
-          caption = "Table 1: Socio-Demographic Descriptive Statistics")
-```
-
-### Descriptive Statistics
+### 
