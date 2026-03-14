@@ -47,7 +47,7 @@ The code chunk below will be used to install and load these packages in RStudio.
 ```{r}
 #| warning: false
 #| message: false
-pacman::p_load("ggstatsplot", "plotly", "DT", "scales","tidyverse","gtsummary")
+pacman::p_load(ggstatsplot, plotly, DT, scales,tidyverse,gtsummary,ggdist, ggridges, ggthemes,colorspace)
 ```
 
 # Exploratory Data Analysis
@@ -153,6 +153,51 @@ descriptive_summary_table <- customers_cleaned %>%
 descriptive_summary_table
 ```
 
+Review the statistical summary of the **spending behaviours**
+
+```{r}
+library(gtsummary)
+library(gt)
+
+continuous_summary_table <- customers_cleaned %>%
+  select(tx_count, avg_tx_value, total_tx_volume) %>%
+  tbl_summary(
+    statistic = list(
+      all_continuous() ~ "{mean} ({sd}) | {median} ({p25}, {p75}) | [{min}, {max}]"
+    ),
+    digits = all_continuous() ~ 0, # Financial volumes don't need decimals
+    label = list(
+      tx_count ~ "Transaction Count (Frequency)",
+      avg_tx_value ~ "Average Transaction Value (COP)",
+      total_tx_volume ~ "Total Transaction Volume (COP)"
+    )
+  ) %>%
+  modify_header(label = "**Financial Metric**") %>%
+  as_gt() %>%
+  tab_header(
+    title = "Financial Performance Descriptive Statistics",
+    subtitle = "Summary of User Transaction Behavior (2023)"
+  ) %>%
+  opt_stylize(color = "blue", style = 1)
+
+continuous_summary_table
+```
+
+```{r}
+ggplot(data = customers_cleaned, 
+       aes(x = avg_tx_value)) +
+  geom_histogram(bins = 20, 
+                 boundary = 100,
+                 color = "grey25", 
+                 fill = "grey90") +
+  # Use labs to define the x-axis title
+  labs(x = "Average Transaction $", 
+       title = "Distribution of Average Transaction $") +
+  theme_economist() +
+  # This line is CRITICAL: Economist theme hides titles by default
+  theme(axis.title.x = element_text(display = "block", size = 12, vjust = -1))
+```
+
 Analyzing how different categories affects the Transaction Amount vs. Frequency behavior
 
 1.  Education Level
@@ -164,6 +209,92 @@ Analyzing how different categories affects the Transaction Amount vs. Frequency 
 
 ### 1. Education Level
 
+Visualizing distribution using half eye graph and boxplot
+
+```{r}
+plot_distribution <- function(cat_var) {
+  
+  ggplot(customers_cleaned,
+         aes(x = {{cat_var}}, 
+             y = avg_tx_value)) +
+    
+    stat_halfeye(
+      adjust = 0.5,
+      justification = -0.2,
+      .width = 0,
+      point_colour = NA
+    ) +
+    
+    geom_boxplot(
+      width = 0.20,
+      outlier.shape = NA
+    ) +
+    
+    stat_dots(
+      side = "left",
+      justification = 1.2,
+      binwidth = 0.5,
+      dotsize = 2
+    ) +
+    
+    labs(
+      x = deparse(substitute(cat_var)),
+      y = "Average Transaction Value",
+      title = paste("Distribution of Average Transaction Value by", 
+                    deparse(substitute(cat_var)))
+    ) +
+    
+    theme_minimal()
+}
+```
+
+```{r}
+plot_distribution(education_level)
+```
+
+Visualizing distribution using half eye graph and boxplot on a Log Scale (Base 10)
+
+```{r}
+plot_demo_log <- function(cat_var) {
+  
+  ggplot(customers_cleaned, 
+         aes(x = {{cat_var}}, 
+             y = avg_tx_value, 
+             fill = {{cat_var}})) +
+    
+    stat_halfeye(
+      adjust = 0.5,
+      justification = -0.2,
+      .width = 0,
+      point_colour = NA
+    ) +
+    
+    geom_boxplot(
+      width = 0.20,
+      outlier.shape = NA
+    ) +
+    
+    scale_y_log10(
+      labels = scales::label_number(scale = 1e-6, suffix = "M"),
+      name = "Avg Transaction Value (COP) - Log Scale"
+    ) +
+    
+    labs(
+      title = paste("Socio-Demographic Analysis (Log-Transformed):",
+                    deparse(substitute(cat_var))),
+      x = deparse(substitute(cat_var))
+    ) +
+    
+    theme_minimal()
+}
+```
+
+```{r}
+plot_demo_log(education_level)
+```
+
+Correlation Analysis (relationship between average transaction value vs transaction count (frequency)
+
 ```{r}
 options(scipen = 999)
 
@@ -174,7 +305,7 @@ plot_behavior_correlation <- function(a) {
     y = tx_count,
     type = "nonparametric", 
     title = paste("Socio-Demographic Factor Analysis:", a),
-    xlab = "Average Transaction $",
+    xlab = "Average Transaction Value",
     ylab = "Transaction Frequency"
   ) + 
     facet_wrap(vars(!!sym(a))) +
@@ -194,6 +325,18 @@ plot_behavior_correlation("education_level")
 
 ### 2. Marital Status
 
+Visualizing distribution using half eye graph and boxplot
+
+```{r}
+plot_distribution(marital_status)
+```
+
+Visualizing distribution using half eye graph and boxplot on a Log Scale (Base 10)
+
+```{r}
+plot_demo_log(marital_status)
+```
+
 ```{r}
 #| warning: false
 #| message: false
@@ -201,6 +344,14 @@ plot_behavior_correlation("marital_status")
 ```
 
 ### 3. Gender
+
+```{r}
+plot_distribution(gender)
+```
+
+```{r}
+plot_demo_log(gender)
+```
 
 ```{r}
 #| warning: false
@@ -211,12 +362,30 @@ plot_behavior_correlation("gender")
 ### 4. Age
 
 ```{r}
+plot_distribution(age_group)
+```
+
+```{r}
+plot_demo_log(age_group)
+```
+
+```{r}
 #| warning: false
 #| message: false
 plot_behavior_correlation("age_group")
+
+
 ```
 
 ### 5. Income Bracket
+
+```{r}
+plot_distribution(income_bracket)
+```
+
+```{r}
+plot_demo_log(income_bracket)
+```
 
 ```{r}
 #| warning: false
@@ -227,12 +396,205 @@ plot_behavior_correlation("income_bracket")
 ### 6. Household Size
 
 ```{r}
+plot_distribution(hh_group)
+```
+
+```{r}
+plot_demo_log(hh_group)
+```
+
+```{r}
 #| warning: false
 #| message: false
 plot_behavior_correlation("hh_group")
-
 ```
 
 # Confirmatory Data Analysis
 
-### 
+## Oneway ANOVA Test: *ggbetweenstats()* method
+
+In the code chunk below, [*ggbetweenstats()*](https://indrajeetpatil.github.io/ggstatsplot/reference/ggbetweenstats.html) is used to build a visual for One-way ANOVA test on Average Transaction Amount by different variables.
+
+### 1. Education Level
+
+```{r}
+
+ggbetweenstats(
+  data = customers_cleaned,
+  x = education_level,
+  y = avg_tx_value,
+  type = "nonparametric",
+  ylab = "Average Transaction Value",
+  xlab = "Education Level",
+  title = "Average Transaction Value by Education Level",
+  mean.ci = TRUE, 
+  pairwise.comparisons = TRUE, 
+  pairwise.display = "s",
+  p.adjust.method = "fdr",
+  messages = FALSE
+)
+```
+
+### 2. Marital Status
+
+```{r}
+
+ggbetweenstats(
+  data = customers_cleaned,
+  x = marital_status,
+  y = avg_tx_value,
+  type = "nonparametric",
+  ylab = "Average Transaction Value",
+  xlab = "Marital Status",
+  title = "Average Transaction Value by Marital Status",
+  mean.ci = TRUE, 
+  pairwise.comparisons = TRUE, 
+  pairwise.display = "s",
+  p.adjust.method = "fdr",
+  messages = FALSE
+)
+
+```
+
+### 3. Gender
+
+```{r}
+
+ggbetweenstats(
+  data = customers_cleaned,
+  x = gender,
+  y = avg_tx_value,
+  type = "nonparametric",
+  ylab = "Average Transaction Value",
+  xlab = "Gender",
+  title = "Average Transaction Value by Gender",
+  mean.ci = TRUE, 
+  pairwise.comparisons = TRUE, 
+  pairwise.display = "s",
+  p.adjust.method = "fdr",
+  messages = FALSE
+)
+
+
+```
+
+### 4. Age
+
+```{r}
+
+ggbetweenstats(
+  data = customers_cleaned,
+  x = age_group,
+  y = avg_tx_value,
+  type = "nonparametric",
+  ylab = "Average Transaction Value",
+  xlab = "Age Group",
+  title = "Average Transaction Value by Age Group",
+  mean.ci = TRUE, 
+  pairwise.comparisons = TRUE, 
+  pairwise.display = "s",
+  p.adjust.method = "fdr",
+  messages = FALSE
+)
+```
+
+### 5. Income Bracket
+
+```{r}
+ggbetweenstats(
+  data = customers_cleaned,
+  x = income_bracket,
+  y = avg_tx_value,
+  type = "nonparametric",
+  ylab = "Average Transaction Value",
+  xlab = "Income Bracket",
+  title = "Average Transaction Value by Income Bracket",
+  mean.ci = TRUE, 
+  pairwise.comparisons = TRUE, 
+  pairwise.display = "s",
+  p.adjust.method = "fdr",
+  messages = FALSE
+)
+```
+
+### 6. Household Size
+
+```{r}
+ggbetweenstats(
+  data = customers_cleaned,
+  x = hh_group,
+  y = avg_tx_value,
+  type = "nonparametric",
+  ylab = "Average Transaction Value",
+  xlab = "Household Group Size",
+  title = "Average Transaction Value by Household Group Size",
+  mean.ci = TRUE, 
+  pairwise.comparisons = TRUE, 
+  pairwise.display = "s",
+  p.adjust.method = "fdr",
+  messages = FALSE
+)
+```
+
+## Significant Test of Association (Depedence) : *ggbarstats()* methods
+
+### 1. Education Level
+
+In the code chunk below, the Maths scores is binned into a 4-class variable by using [*cut()*](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/cut).
+
+```{r}
+customers_cleaned <- customers_cleaned %>% 
+  mutate(Average_Transaction_bins = 
+           cut(avg_tx_value, 
+               breaks = c(0, 1339108, 4658605, Inf),
+               labels = c("Low Spend", "Medium Spend", "High Spend"))
+)
+```
+
+In this code chunk below [*ggbarstats()*](https://indrajeetpatil.github.io/ggstatsplot/reference/ggbarstats.html) is used to build a visual for Significant Test of Association
+
+```{r}
+ggbarstats(customers_cleaned, 
+           x = Average_Transaction_bins, 
+           y = education_level)
+```
+
+### 2. Marital Status
+
+```{r}
+ggbarstats(customers_cleaned, 
+           x = Average_Transaction_bins, 
+           y = marital_status)
+```
+
+### 3. Gender
+
+```{r}
+ggbarstats(customers_cleaned, 
+           x = Average_Transaction_bins, 
+           y = gender)
+```
+
+### 4. Age
+
+```{r}
+ggbarstats(customers_cleaned, 
+           x = Average_Transaction_bins, 
+           y = age_group)
+```
+
+### 5. Income Bracket
+
+```{r}
+ggbarstats(customers_cleaned, 
+           x = Average_Transaction_bins, 
+           y = income_bracket)
+```
+
+### 6. Household size
+
+```{r}
+ggbarstats(customers_cleaned, 
+           x = Average_Transaction_bins, 
+           y = hh_group)
+```
