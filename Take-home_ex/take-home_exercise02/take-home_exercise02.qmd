@@ -75,7 +75,7 @@ The code chunk below will be used to install and load these packages in RStudio.
 ```{r}
 #| warning: false
 #| message: false
-pacman::p_load("ggstatsplot", "plotly", "DT", "scales","tidyverse")
+pacman::p_load("ggstatsplot", "plotly", "DT", "scales","tidyverse","gtsummary")
 ```
 
 # Exploratory Data Analysis
@@ -130,7 +130,7 @@ plot_behavior_correlation("marital_status")
 plot_behavior_correlation("gender")
 ```
 
-###  4. Age
+### 4. Age
 
 ```{r}
 library(dplyr)
@@ -248,6 +248,42 @@ p_dept %>%
 
 ### Data Overview
 
-```{r}
+### Descriptive Statistics
 
+```{r}
+library(tidyverse)
+library(gtsummary)
+library(DT)
+
+# Select your categories and the target metric
+descriptive_summary <- customers %>%
+  select(education_level, marital_status, gender, age_group, 
+         income_bracket, hh_group, total_tx_volume) %>%
+  # Create the summary table
+  tbl_summary(
+    by = NULL, # You can set this to 'gender' if you want to compare columns
+    statistic = list(
+      all_continuous() ~ "{mean} ({sd}) | {median} ({p25}, {p75})",
+      all_categorical() ~ "{n} ({p}%)"
+    ),
+    digits = all_continuous() ~ 2,
+    label = list(
+      education_level ~ "Education Level",
+      marital_status ~ "Marital Status",
+      gender ~ "Gender",
+      age_group ~ "Age Group",
+      income_bracket ~ "Income Bracket",
+      hh_group ~ "Household Size",
+      total_tx_volume ~ "Total Transaction Volume (COP)"
+    )
+  ) %>%
+  add_n() %>% # Add count of non-missing observations
+  as_tibble()
+
+# Render as an interactive table for your Netlify site
+datatable(descriptive_summary, 
+          class = "hover", 
+          caption = "Table 1: Socio-Demographic Descriptive Statistics")
 ```
+
+### Descriptive Statistics
