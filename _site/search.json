@@ -1174,5 +1174,12 @@
     "title": "COFINFAD: Colombian Fintech Financial Analysis",
     "section": "Significant Test of Association (Depedence) : ggbarstats() methods",
     "text": "Significant Test of Association (Depedence) : ggbarstats() methods\n\n1. Education Level\nIn the code chunk below, the Maths scores is binned into a 4-class variable by using cut().\n\ncustomers_cleaned &lt;- customers_cleaned %&gt;% \n  mutate(Average_Transaction_bins = \n           cut(avg_tx_value, \n               breaks = c(0, 1339108, 4658605, Inf),\n               labels = c(\"Low Spend\", \"Medium Spend\", \"High Spend\"))\n)\n\nIn this code chunk below ggbarstats() is used to build a visual for Significant Test of Association\n\nggbarstats(customers_cleaned, \n           x = Average_Transaction_bins, \n           y = education_level)\n\n\n\n\n\n\n\n\n\n\n2. Marital Status\n\nggbarstats(customers_cleaned, \n           x = Average_Transaction_bins, \n           y = marital_status)\n\n\n\n\n\n\n\n\n\n\n3. Gender\n\nggbarstats(customers_cleaned, \n           x = Average_Transaction_bins, \n           y = gender)\n\n\n\n\n\n\n\n\n\n\n4. Age\n\nggbarstats(customers_cleaned, \n           x = Average_Transaction_bins, \n           y = age_group)\n\n\n\n\n\n\n\n\n\n\n5. Income Bracket\n\nggbarstats(customers_cleaned, \n           x = Average_Transaction_bins, \n           y = income_bracket)\n\n\n\n\n\n\n\n\n\n\n6. Household size\n\nggbarstats(customers_cleaned, \n           x = Average_Transaction_bins, \n           y = hh_group)"
+  },
+  {
+    "objectID": "Take-home_ex/take-home_exercise02/take-home_exercise02 - UI design.html",
+    "href": "Take-home_ex/take-home_exercise02/take-home_exercise02 - UI design.html",
+    "title": "COFINFAD: Colombian Fintech Financial Analysis",
+    "section": "",
+    "text": "UI Design"
   }
 ]
