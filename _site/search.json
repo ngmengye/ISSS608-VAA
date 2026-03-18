@@ -1181,5 +1181,47 @@
     "title": "COFINFAD: Colombian Fintech Financial Analysis",
     "section": "",
     "text": "UI Design"
+  },
+  {
+    "objectID": "Take-home_ex/take-home_exercise02/project proposal.html",
+    "href": "Take-home_ex/take-home_exercise02/project proposal.html",
+    "title": "COFINFAD: Colombian Fintech Financial Analysis",
+    "section": "",
+    "text": "The Colombian fintech sector has seen record growth (reaching nearly 400 companies by 2024), yet understanding the “why” behind user retention and satisfaction remains a challenge.\n\nThe Goal: Move beyond simple reporting to understand how socio-demographics (age, income level, education) drive actual financial behavior.\nThe Problem: Fintech users are not a monolith; “Mainstream” users have vastly different needs than “High-Value” investors. Our tool will allow stakeholders to segment these users dynamically."
+  },
+  {
+    "objectID": "Take-home_ex/take-home_exercise02/project proposal.html#project-motivation-objective",
+    "href": "Take-home_ex/take-home_exercise02/project proposal.html#project-motivation-objective",
+    "title": "COFINFAD: Colombian Fintech Financial Analysis",
+    "section": "",
+    "text": "The Colombian fintech sector has seen record growth (reaching nearly 400 companies by 2024), yet understanding the “why” behind user retention and satisfaction remains a challenge.\n\nThe Goal: Move beyond simple reporting to understand how socio-demographics (age, income level, education) drive actual financial behavior.\nThe Problem: Fintech users are not a monolith; “Mainstream” users have vastly different needs than “High-Value” investors. Our tool will allow stakeholders to segment these users dynamically."
+  },
+  {
+    "objectID": "Take-home_ex/take-home_exercise02/project proposal.html#data-overview-the-cofinfad-dataset",
+    "href": "Take-home_ex/take-home_exercise02/project proposal.html#data-overview-the-cofinfad-dataset",
+    "title": "COFINFAD: Colombian Fintech Financial Analysis",
+    "section": "2. Data Overview: The COFINFAD Dataset",
+    "text": "2. Data Overview: The COFINFAD Dataset\nThe dataset captures this transition from traditional cash-based behavior to a digital-first economy.\n\nTransactional Data: Captures the “pulse” of activity across 3.1M+ records, categorized into Transfer, Withdrawal, and Payment.\nCustomer Profiles: Includes 54 variables that allow us to see how demographics (like the income_bracket or location) correlate with app_logins_frequency and satisfaction_score.\n\n\n\n\n\n\n\n\n\n\nCategory\nKey Variables\nData Type\nPurpose\n\n\nDemographics\nAge, Income, Education, Household Size\nCategorical/Numeric\nBasis for segmentation and bias checks.\n\n\nEngagement\nDigital Engagement Score, App Open Frequency\nNumeric (0-1)\nIdentifying “Sticky” vs. “Chilled” users.\n\n\nFinancials\nTotal Transaction Vol, Avg Trans Value, Frequency\nContinuous\nMeasuring the “wallet share” of the user.\n\n\nSentiment\nCustomer Satisfaction (CSAT) Score\nOrdinal (1-5)\nTarget variable for predictive modeling."
+  },
+  {
+    "objectID": "Take-home_ex/take-home_exercise02/project proposal.html#the-methodology-the-three-pillars",
+    "href": "Take-home_ex/take-home_exercise02/project proposal.html#the-methodology-the-three-pillars",
+    "title": "COFINFAD: Colombian Fintech Financial Analysis",
+    "section": "3. The Methodology (The “Three Pillars”)",
+    "text": "3. The Methodology (The “Three Pillars”)\nThis is where you align your team’s specific roles with the technical approach:\n\nA. Exploratory & Confirmatory Analysis (EDA/CDA)\n\nFocus: Use Non-parametric tests (like Kruskal-Wallis) to see if transaction volume significantly differs across income brackets.\nVisuals: Boxplots for distribution and Correlation Matrices to see if “Age” actually correlates with “Transaction Frequency.”\n\n\n\nB. Customer Segmentation (Clustering)\n\nApproach: Perform K-Means or Hierarchical Clustering using R’s cluster and factoextra packages.\nObjective: Identify the “Profiles.” Are high-income users actually the most active, or is it the mid-income “digital natives”?\n\n\n\nC. Predictive Modelling\n\nTarget: Predict Customer Satisfaction (High vs. Low) or Churn Risk.\nAlgorithm: Use Random Forest or Logistic Regression. We will visualize “Variable Importance” to show which factors (e.g., App speed vs. Transaction fees) drive satisfaction most."
+  },
+  {
+    "objectID": "Take-home_ex/take-home_exercise02/project proposal.html#prototype",
+    "href": "Take-home_ex/take-home_exercise02/project proposal.html#prototype",
+    "title": "COFINFAD: Colombian Fintech Financial Analysis",
+    "section": "4. Prototype",
+    "text": "4. Prototype\nThe team has decided to split the main prototype modules as follows:\n\nExploratory Data Analysis\nClustering Analysis\nPredictive Analysis"
+  },
+  {
+    "objectID": "Take-home_ex/take-home_exercise02/project proposal.html#project-timeline-and-work-allocation",
+    "href": "Take-home_ex/take-home_exercise02/project proposal.html#project-timeline-and-work-allocation",
+    "title": "COFINFAD: Colombian Fintech Financial Analysis",
+    "section": "5. Project Timeline and Work Allocation",
+    "text": "5. Project Timeline and Work Allocation"
   }
 ]

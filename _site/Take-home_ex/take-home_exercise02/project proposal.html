@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Ng Meng Ye">
+<meta name="author" content="Gautamgovan Elangovan, Ng Meng Ye, Chandru Kolanchiyappan">
 
 <title>COFINFAD: Colombian Fintech Financial Analysis – ISSS608-VAA</title>
 <style>
@@ -182,7 +182,16 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#ui-design" id="toc-ui-design" class="nav-link active" data-scroll-target="#ui-design">UI Design</a></li>
+  <li><a href="#project-motivation-objective" id="toc-project-motivation-objective" class="nav-link active" data-scroll-target="#project-motivation-objective">1. Project Motivation &amp; Objective</a></li>
+  <li><a href="#data-overview-the-cofinfad-dataset" id="toc-data-overview-the-cofinfad-dataset" class="nav-link" data-scroll-target="#data-overview-the-cofinfad-dataset">2. Data Overview: The COFINFAD Dataset</a></li>
+  <li><a href="#the-methodology-the-three-pillars" id="toc-the-methodology-the-three-pillars" class="nav-link" data-scroll-target="#the-methodology-the-three-pillars">3. The Methodology (The “Three Pillars”)</a>
+  <ul class="collapse">
+  <li><a href="#a.-exploratory-confirmatory-analysis-edacda" id="toc-a.-exploratory-confirmatory-analysis-edacda" class="nav-link" data-scroll-target="#a.-exploratory-confirmatory-analysis-edacda">A. Exploratory &amp; Confirmatory Analysis (EDA/CDA)</a></li>
+  <li><a href="#b.-customer-segmentation-clustering" id="toc-b.-customer-segmentation-clustering" class="nav-link" data-scroll-target="#b.-customer-segmentation-clustering">B. Customer Segmentation (Clustering)</a></li>
+  <li><a href="#c.-predictive-modelling" id="toc-c.-predictive-modelling" class="nav-link" data-scroll-target="#c.-predictive-modelling">C. Predictive Modelling</a></li>
+  </ul></li>
+  <li><a href="#prototype" id="toc-prototype" class="nav-link" data-scroll-target="#prototype">4. Prototype</a></li>
+  <li><a href="#project-timeline-and-work-allocation" id="toc-project-timeline-and-work-allocation" class="nav-link" data-scroll-target="#project-timeline-and-work-allocation">5. Project Timeline and Work Allocation</a></li>
   </ul>
 </nav>
     </div>
@@ -201,7 +210,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Author</div>
     <div class="quarto-title-meta-contents">
-             <p>Ng Meng Ye </p>
+             <p>Gautamgovan Elangovan, Ng Meng Ye, Chandru Kolanchiyappan </p>
           </div>
   </div>
     
@@ -214,9 +223,99 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<section id="ui-design" class="level1">
-<h1>UI Design</h1>
-<p><img src="images/clipboard-660265215.png" class="img-fluid"></p>
+<section id="project-motivation-objective" class="level2">
+<h2 class="anchored" data-anchor-id="project-motivation-objective">1. Project Motivation &amp; Objective</h2>
+<p>The Colombian fintech sector has seen record growth (reaching nearly 400 companies by 2024), yet understanding the “why” behind user retention and satisfaction remains a challenge.</p>
+<ul>
+<li><p><strong>The Goal:</strong> Move beyond simple reporting to understand how socio-demographics (age, income level, education) drive actual financial behavior.</p></li>
+<li><p><strong>The Problem:</strong> Fintech users are not a monolith; “Mainstream” users have vastly different needs than “High-Value” investors. Our tool will allow stakeholders to segment these users dynamically.</p></li>
+</ul>
+</section>
+<section id="data-overview-the-cofinfad-dataset" class="level2">
+<h2 class="anchored" data-anchor-id="data-overview-the-cofinfad-dataset">2. Data Overview: The COFINFAD Dataset</h2>
+<p>The dataset captures this transition from traditional cash-based behavior to a digital-first economy.</p>
+<ul>
+<li><p><strong>Transactional Data</strong>: Captures the “pulse” of activity across 3.1M+ records, categorized into <code>Transfer</code>, <code>Withdrawal</code>, and <code>Payment</code>.</p></li>
+<li><p><strong>Customer Profiles</strong>: Includes 54 variables that allow us to see how demographics (like the <strong>income_bracket</strong> or <strong>location</strong>) correlate with <strong>app_logins_frequency</strong> and <strong>satisfaction_score</strong>.</p></li>
+</ul>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><strong>Category</strong></td>
+<td><strong>Key Variables</strong></td>
+<td><strong>Data Type</strong></td>
+<td><strong>Purpose</strong></td>
+</tr>
+<tr class="even">
+<td><strong>Demographics</strong></td>
+<td>Age, Income, Education, Household Size</td>
+<td>Categorical/Numeric</td>
+<td>Basis for segmentation and bias checks.</td>
+</tr>
+<tr class="odd">
+<td><strong>Engagement</strong></td>
+<td>Digital Engagement Score, App Open Frequency</td>
+<td>Numeric (0-1)</td>
+<td>Identifying “Sticky” vs.&nbsp;“Chilled” users.</td>
+</tr>
+<tr class="even">
+<td><strong>Financials</strong></td>
+<td>Total Transaction Vol, Avg Trans Value, Frequency</td>
+<td>Continuous</td>
+<td>Measuring the “wallet share” of the user.</td>
+</tr>
+<tr class="odd">
+<td><strong>Sentiment</strong></td>
+<td>Customer Satisfaction (CSAT) Score</td>
+<td>Ordinal (1-5)</td>
+<td>Target variable for predictive modeling.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="the-methodology-the-three-pillars" class="level2">
+<h2 class="anchored" data-anchor-id="the-methodology-the-three-pillars">3. The Methodology (The “Three Pillars”)</h2>
+<p>This is where you align your team’s specific roles with the technical approach:</p>
+<section id="a.-exploratory-confirmatory-analysis-edacda" class="level3">
+<h3 class="anchored" data-anchor-id="a.-exploratory-confirmatory-analysis-edacda">A. Exploratory &amp; Confirmatory Analysis (EDA/CDA)</h3>
+<ul>
+<li><p><strong>Focus:</strong> Use <strong>Non-parametric tests</strong> (like Kruskal-Wallis) to see if transaction volume significantly differs across income brackets.</p></li>
+<li><p><strong>Visuals:</strong> Boxplots for distribution and <strong>Correlation Matrices</strong> to see if “Age” actually correlates with “Transaction Frequency.”</p></li>
+</ul>
+</section>
+<section id="b.-customer-segmentation-clustering" class="level3">
+<h3 class="anchored" data-anchor-id="b.-customer-segmentation-clustering">B. Customer Segmentation (Clustering)</h3>
+<ul>
+<li><p><strong>Approach:</strong> Perform <strong>K-Means</strong> or <strong>Hierarchical Clustering</strong> using R’s <code>cluster</code> and <code>factoextra</code> packages.</p></li>
+<li><p><strong>Objective:</strong> Identify the “Profiles.” Are high-income users actually the most active, or is it the mid-income “digital natives”?</p></li>
+</ul>
+</section>
+<section id="c.-predictive-modelling" class="level3">
+<h3 class="anchored" data-anchor-id="c.-predictive-modelling">C. Predictive Modelling</h3>
+<ul>
+<li><p><strong>Target:</strong> Predict <strong>Customer Satisfaction</strong> (High vs.&nbsp;Low) or <strong>Churn Risk</strong>.</p></li>
+<li><p><strong>Algorithm:</strong> Use <strong>Random Forest</strong> or <strong>Logistic Regression</strong>. We will visualize “Variable Importance” to show which factors (e.g., App speed vs.&nbsp;Transaction fees) drive satisfaction most.</p></li>
+</ul>
+</section>
+</section>
+<section id="prototype" class="level2">
+<h2 class="anchored" data-anchor-id="prototype">4. Prototype</h2>
+<p>The team has decided to split the main prototype modules as follows:</p>
+<ul>
+<li><p>Exploratory Data Analysis</p></li>
+<li><p>Clustering Analysis</p></li>
+<li><p>Predictive Analysis</p></li>
+</ul>
+</section>
+<section id="project-timeline-and-work-allocation" class="level2">
+<h2 class="anchored" data-anchor-id="project-timeline-and-work-allocation">5. Project Timeline and Work Allocation</h2>
+<p><img src="images/clipboard-1159588099.png" class="img-fluid"></p>
 
 
 </section>
