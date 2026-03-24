@@ -598,3 +598,7 @@ ggbarstats(customers_cleaned,
            x = Average_Transaction_bins, 
            y = hh_group)
 ```
+
+```{r}
+saveRDS(customers_cleaned, "data/customers_shiny.rds")
+```
